@@ -1,0 +1,106 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 0 8px 0 18px;
+  border: 1px solid var(--solid);
+  border-radius: 10px;
+  background: var(--solid);
+  color: var(--on-solid);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out),
+    background-color 200ms ease;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.06), 0 10px 24px -14px rgb(0 0 0 / 0.5);
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.06), 0 16px 32px -16px rgb(0 0 0 / 0.55);
+}
+
+.chip:active {
+  transform: translateY(0);
+}
+
+.chip[data-size="lg"] {
+  min-height: 60px;
+  padding-left: 22px;
+  gap: 18px;
+}
+
+.prompt {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.82rem;
+  opacity: 0.55;
+}
+
+.command {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.chip[data-size="lg"] .command {
+  font-size: 1rem;
+}
+
+.action {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--on-solid) 12%, transparent);
+  font-size: 0.8125rem;
+  font-weight: 560;
+  transition: background-color 200ms ease;
+}
+
+.chip:hover .action {
+  background: color-mix(in srgb, var(--on-solid) 20%, transparent);
+}
+
+.icon {
+  display: inline-flex;
+}
+
+.chip[data-state="copied"] .icon {
+  animation: pop 420ms var(--ease-out);
+}
+
+.label {
+  min-width: 4.6ch;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .chip,
+  .chip[data-size="lg"] {
+    gap: 10px;
+    min-height: 54px;
+    padding-left: 16px;
+  }
+  .command,
+  .chip[data-size="lg"] .command {
+    font-size: 0.8rem;
+  }
+  .action {
+    padding: 0 10px;
+  }
+  .label {
+    display: none;
+  }
+}

@@ -1,0 +1,263 @@
+/*
+ * Pure neutrals, no hue. Light sections read like a code review page, dark
+ * sections like a terminal; every component takes its colours from the
+ * section theme it sits in.
+ */
+:root {
+  --ink: #0a0a0a;
+  --paper: #f5f5f5;
+
+  --gutter: clamp(16px, 4.2vw, 48px);
+  --max: 1240px;
+  --nav-h: 64px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --fs-display: clamp(2.15rem, 1rem + 4.9vw, 5.75rem);
+  --fs-h2: clamp(2.05rem, 1.3rem + 2.6vw, 3.6rem);
+  --fs-h3: clamp(1.2rem, 1.08rem + 0.4vw, 1.4rem);
+  --fs-lead: clamp(1.1rem, 1.02rem + 0.32vw, 1.28rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.875rem;
+  --fs-code: clamp(0.72rem, 0.67rem + 0.2vw, 0.82rem);
+
+  --wide: "wdth" 112;
+  --mono-width: "wdth" 87.5;
+}
+
+:root,
+[data-theme="light"] {
+  --bg: #f5f5f5;
+  --fg: #0a0a0a;
+  --fg-2: #474747;
+  --fg-3: #6e6e6e;
+  --line: #e1e1e1;
+  --line-2: #cbcbcb;
+  --surface: #ffffff;
+  --bar: #f0f0f0;
+  --bar-strong: #e4e4e4;
+  --hatch: #e3e3e3;
+  --solid: #0a0a0a;
+  --on-solid: #f5f5f5;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.04), 0 28px 56px -28px rgb(0 0 0 / 0.22);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --fg: #ededed;
+  --fg-2: #ababab;
+  --fg-3: #858585;
+  --line: #222222;
+  --line-2: #333333;
+  --surface: #111111;
+  --bar: #181818;
+  --bar-strong: #232323;
+  --hatch: #1e1e1e;
+  --solid: #ededed;
+  --on-solid: #0a0a0a;
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.03), 0 28px 56px -28px rgb(0 0 0 / 0.9);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--paper);
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  scrollbar-color: #8c8c8c transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  caret-color: var(--fg);
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+blockquote,
+ol,
+ul,
+dl,
+dd,
+pre {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 720;
+  font-variation-settings: var(--wide);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.24em;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-variation-settings: var(--mono-width);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+svg {
+  display: block;
+  flex: none;
+}
+
+::selection {
+  background: var(--solid);
+  color: var(--on-solid);
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8c8c8c;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+.wrap {
+  width: min(100% - 2 * var(--gutter), var(--max));
+  margin-inline: auto;
+}
+
+.section {
+  position: relative;
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(96px, 11vw, 168px);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -64px;
+  z-index: 100;
+  padding: 10px 14px;
+  background: var(--solid);
+  color: var(--on-solid);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: top 200ms var(--ease-out);
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/*
+ * Scroll reveals. Content is visible by default; MotionRoot marks only the
+ * elements still below the fold as pending, so nothing hides before it has
+ * been seen and nothing hides at all without JavaScript or with reduced motion.
+ */
+.motion [data-reveal] {
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 1100ms var(--ease-out),
+    filter 900ms var(--ease-out),
+    clip-path 820ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger, 70ms) + var(--delay, 0ms));
+}
+
+.motion [data-reveal].is-pending {
+  opacity: 0;
+}
+
+.motion [data-reveal="rise"].is-pending {
+  transform: translateY(28px);
+  filter: blur(8px);
+}
+
+.motion [data-reveal="apply"].is-pending {
+  clip-path: inset(0 100% 0 0);
+  opacity: 0.2;
+}
+
+.motion [data-reveal="print"] {
+  transition: opacity 1ms linear;
+  transition-delay: calc(var(--i, 0) * var(--stagger, 34ms) + var(--delay, 0ms));
+}
+
+.motion [data-reveal="rule"] {
+  transform-origin: left center;
+}
+
+.motion [data-reveal="rule"].is-pending {
+  transform: scaleX(0);
+  opacity: 1;
+}

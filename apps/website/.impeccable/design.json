@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-09T18:38:10.201849+00:00",
+  "title": "Design System: diditbreak website",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#f5f5f5",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "#0a0a0a",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-fg-2": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "canonical": "#474747",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-fg-3": {
+        "role": "neutral",
+        "displayName": "Tertiary Text",
+        "canonical": "#6e6e6e",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e1e1e1",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-line-2": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#cbcbcb",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-surface": {
+        "role": "neutral",
+        "displayName": "White File",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-bar": {
+        "role": "neutral",
+        "displayName": "Bar Grey",
+        "canonical": "#f0f0f0",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "review-bar-strong": {
+        "role": "neutral",
+        "displayName": "Strong Bar Grey",
+        "canonical": "#e4e4e4",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-fg": {
+        "role": "primary",
+        "displayName": "Terminal Light",
+        "canonical": "#ededed",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-fg-2": {
+        "role": "neutral",
+        "displayName": "Terminal Grey 2",
+        "canonical": "#ababab",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-fg-3": {
+        "role": "neutral",
+        "displayName": "Terminal Grey 3",
+        "canonical": "#858585",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-line": {
+        "role": "neutral",
+        "displayName": "Terminal Hairline",
+        "canonical": "#222222",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-line-2": {
+        "role": "neutral",
+        "displayName": "Terminal Strong Hairline",
+        "canonical": "#333333",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-surface": {
+        "role": "neutral",
+        "displayName": "Terminal File",
+        "canonical": "#111111",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-bar": {
+        "role": "neutral",
+        "displayName": "Terminal Bar",
+        "canonical": "#181818",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      },
+      "terminal-bar-strong": {
+        "role": "neutral",
+        "displayName": "Terminal Strong Bar",
+        "canonical": "#232323",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#181818",
+          "#333333",
+          "#474747",
+          "#6e6e6e",
+          "#ababab",
+          "#e1e1e1",
+          "#f5f5f5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only (merge-box headline shares weight and tracking)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Review-comment and step titles."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The paragraph under a section heading."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "File names, check titles, meta, column heads; sentence case."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Diff lines, hunk headers, terminal output, commands."
+      }
+    },
+    "shadows": [
+      {
+        "name": "file-lift-light",
+        "value": "0 1px 0 rgb(0 0 0 / 0.04), 0 28px 56px -28px rgb(0 0 0 / 0.22)",
+        "purpose": "Whole artefacts on review (light) sections."
+      },
+      {
+        "name": "file-lift-dark",
+        "value": "0 1px 0 rgb(255 255 255 / 0.03), 0 28px 56px -28px rgb(0 0 0 / 0.9)",
+        "purpose": "Whole artefacts on terminal (dark) sections."
+      },
+      {
+        "name": "chip-lift",
+        "value": "0 1px 0 rgb(0 0 0 / 0.06), 0 10px 24px -14px rgb(0 0 0 / 0.5)",
+        "purpose": "Command chip at rest."
+      },
+      {
+        "name": "chip-lift-hover",
+        "value": "0 1px 0 rgb(0 0 0 / 0.06), 0 16px 32px -16px rgb(0 0 0 / 0.55)",
+        "purpose": "Command chip on hover, with a 1px rise."
+      },
+      {
+        "name": "outline-ring",
+        "value": "inset 0 0 0 1.5px currentColor",
+        "purpose": "Removed / not-yet-passed state for diffstat blocks and status icons."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The single easing for reveals, hovers and state changes."
+      },
+      {
+        "name": "reveal-rise",
+        "value": "opacity 900ms, transform translateY(28px) 1100ms, filter blur(8px) 900ms",
+        "purpose": "Headings, leads and rows entering on scroll."
+      },
+      {
+        "name": "reveal-apply",
+        "value": "clip-path inset(0 100% 0 0) to inset(0) 820ms, from opacity 0.2",
+        "purpose": "Diff lines writing in from the gutter."
+      },
+      {
+        "name": "reveal-print",
+        "value": "opacity 1ms linear, 34ms stagger",
+        "purpose": "Terminal output printing line by line."
+      },
+      {
+        "name": "reveal-rule",
+        "value": "scaleX(0) to 1 from the left",
+        "purpose": "Hairlines drawing in."
+      },
+      {
+        "name": "stagger",
+        "value": "70ms (45ms in unified listings)",
+        "purpose": "Delay between siblings in a reveal group."
+      },
+      {
+        "name": "check-resolve",
+        "value": "650ms + index x 260ms",
+        "purpose": "Checks resolving one after another."
+      },
+      {
+        "name": "spinner",
+        "value": "rotate 700ms linear infinite",
+        "purpose": "Pending checks and the hero status line."
+      },
+      {
+        "name": "hover",
+        "value": "200ms ease (colour), 260ms ease-out (movement)",
+        "purpose": "Link underline and arrow nudges, chip rise."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "chip-compact",
+        "value": "420px"
+      },
+      {
+        "name": "phone",
+        "value": "640px"
+      },
+      {
+        "name": "nav-chip",
+        "value": "720px"
+      },
+      {
+        "name": "diff-unified",
+        "value": "760px"
+      },
+      {
+        "name": "stack",
+        "value": "900px to 980px"
+      },
+      {
+        "name": "nav-links",
+        "value": "1080px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Command Chip",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid primary action: copy the install command.",
+      "html": "<button class=\"ds-chip\"><code class=\"ds-chip-prompt\">$</code><code class=\"ds-chip-cmd\">npx diditbreak compare</code><span class=\"ds-chip-action\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5.5\" y=\"5.5\" width=\"8\" height=\"8\" rx=\"1.5\"/><path d=\"M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2\"/></svg><span>Copy</span></span></button>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-chip{display:inline-flex;align-items:center;gap:14px;min-height:52px;padding:0 8px 0 18px;border:1px solid var(--solid);border-radius:10px;background:var(--solid);color:var(--on-solid);cursor:pointer;font-family:var(--sans);box-shadow:0 1px 0 rgb(0 0 0 / .06),0 10px 24px -14px rgb(0 0 0 / .5);transition:transform 260ms var(--ease-out),box-shadow 260ms var(--ease-out)}.ds-chip:hover{transform:translateY(-1px);box-shadow:0 1px 0 rgb(0 0 0 / .06),0 16px 32px -16px rgb(0 0 0 / .55)}.ds-chip:active{transform:none}.ds-chip:focus-visible{outline:2px solid var(--fg);outline-offset:3px}.ds-chip-prompt{font-family:var(--mono);font-size:.82rem;opacity:.55}.ds-chip-cmd{font-family:var(--mono);font-variation-settings:'wdth' 87.5;font-size:.9rem;font-weight:500;letter-spacing:-.01em;white-space:nowrap}.ds-chip-action{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:7px;background:color-mix(in srgb,var(--on-solid) 12%,transparent);font-size:.8125rem;font-weight:560}.ds-chip:hover .ds-chip-action{background:color-mix(in srgb,var(--on-solid) 20%,transparent)}"
+    },
+    {
+      "name": "Text Link",
+      "kind": "button",
+      "refersTo": null,
+      "description": "Secondary action: underlined label with a nudging arrow.",
+      "html": "<a class=\"ds-link\" href=\"#\"><span>View on GitHub</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-link-arrow\"><path d=\"M5 11l6-6M6 5h5v5\"/></svg></a>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-link{display:inline-flex;align-items:center;gap:9px;min-height:52px;color:var(--fg);font-family:var(--sans);font-size:.9375rem;font-weight:560;text-decoration:none}.ds-link span{text-decoration:underline;text-decoration-color:var(--line-2);text-decoration-thickness:1px;text-underline-offset:.3em;transition:text-decoration-color 200ms ease}.ds-link:hover span{text-decoration-color:currentColor}.ds-link-arrow{transition:transform 260ms var(--ease-out)}.ds-link:hover .ds-link-arrow{transform:translate(2px,-2px)}.ds-link:focus-visible{outline:2px solid var(--fg);outline-offset:3px;border-radius:3px}"
+    },
+    {
+      "name": "Diff File",
+      "kind": "custom",
+      "refersTo": "diff-file",
+      "description": "The signature component: a split diff with header, diffstat, hunk header, changed rows and an inverted token.",
+      "html": "<figure class=\"ds-diff\"><div class=\"ds-diff-head\"><code class=\"ds-diff-name\">CLAUDE.md</code><span class=\"ds-stat\"><span>+41</span><span>−0</span><span class=\"ds-blocks\"><i data-k=\"add\"></i><i data-k=\"add\"></i><i data-k=\"add\"></i><i data-k=\"add\"></i><i data-k=\"add\"></i></span></span><span class=\"ds-diff-meta\">working vs HEAD</span></div><div class=\"ds-hunk\"><code>@@ -12,3 +12,4 @@</code></div><div class=\"ds-row\"><div class=\"ds-side\"><span class=\"ds-num\">12</span><span class=\"ds-mk\"></span><code>Use node:test.</code></div><div class=\"ds-side ds-new\"><span class=\"ds-num\">12</span><span class=\"ds-mk\"></span><code>Use node:test.</code></div></div><div class=\"ds-row\" data-k=\"add\"><div class=\"ds-side ds-empty\"></div><div class=\"ds-side ds-new\"><span class=\"ds-num\">13</span><span class=\"ds-mk\">+</span><code>All tests must use <mark class=\"ds-token\">Jest</mark>.</code></div></div></figure>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-diff{margin:0;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;color:var(--fg);font-family:var(--sans)}.ds-diff-head{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 16px;background:var(--bar);border-bottom:1px solid var(--line)}.ds-diff-name{font-family:var(--mono);font-size:.8125rem;font-weight:600}.ds-diff-meta{margin-left:auto;font-size:.75rem;color:var(--fg-3)}.ds-stat{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.75rem;color:var(--fg-2)}.ds-blocks{display:inline-flex;gap:2px;margin-left:2px}.ds-blocks i{width:8px;height:8px;border-radius:1.5px;background:var(--line-2)}.ds-blocks i[data-k=add]{background:var(--fg)}.ds-hunk{padding:5px 16px 5px calc(5em + 4px);background:var(--bar-strong);border-block:1px solid var(--line);font-family:var(--mono);font-size:.78rem;line-height:1.8;color:var(--fg-2)}.ds-row{display:grid;grid-template-columns:1fr 1fr;font-family:var(--mono);font-variation-settings:'wdth' 87.5;font-size:.78rem;line-height:1.95}.ds-side{display:grid;grid-template-columns:3.4em 1.6em minmax(0,1fr);min-height:2em;padding-right:14px}.ds-new{border-left:1px solid var(--line)}.ds-num{padding-right:10px;text-align:right;color:var(--fg-3);font-size:.92em}.ds-mk{text-align:center;font-weight:700}.ds-row[data-k=add] .ds-new{background:var(--bar)}.ds-row[data-k=add] .ds-new .ds-num{background:var(--bar-strong);color:var(--fg-2)}.ds-empty{background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M-2 2 2-2M0 8 8 0M6 10l4-4' stroke='%23e2e2e2' stroke-width='1'/%3E%3C/svg%3E\")}.ds-token{padding:.08em .32em;border-radius:3px;background:var(--solid);color:var(--on-solid)}"
+    },
+    {
+      "name": "Check Panel",
+      "kind": "card",
+      "refersTo": null,
+      "description": "CI-style checks: a summary bar with a solid badge and resolved check rows.",
+      "html": "<div class=\"ds-checks\"><div class=\"ds-checks-sum\"><span class=\"ds-badge\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 8.5l3 3 6-7\"/></svg></span><p><strong>All checks have passed</strong><span>3 successful checks</span></p></div><div class=\"ds-check\"><span class=\"ds-tick\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 8.5l3 3 6-7\"/></svg></span><div><p class=\"ds-check-t\">Disposable git worktrees</p><p class=\"ds-check-b\">Every run starts from a fresh copy.</p></div></div><div class=\"ds-check\"><span class=\"ds-tick ds-pending\"></span><div><p class=\"ds-check-t\">Not yet passed</p><p class=\"ds-check-b\">Outlined, the inverse of a pass.</p></div></div></div>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-checks{border:1px solid var(--line-2);border-radius:12px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;color:var(--fg);font-family:var(--sans)}.ds-checks p{margin:0}.ds-checks-sum{display:flex;align-items:center;gap:14px;padding:18px 22px;background:var(--bar);border-bottom:1px solid var(--line)}.ds-checks-sum p{display:grid}.ds-checks-sum strong{font-weight:650;letter-spacing:-.01em}.ds-checks-sum span{font-size:.8125rem;color:var(--fg-3)}.ds-badge,.ds-tick{display:grid;place-items:center;flex:none;border-radius:50%;background:var(--solid);color:var(--on-solid)}.ds-badge{width:32px;height:32px}.ds-tick{width:22px;height:22px;margin-top:1px}.ds-pending{background:transparent;box-shadow:inset 0 0 0 1.5px var(--fg)}.ds-check{display:flex;gap:14px;padding:16px 22px}.ds-check+.ds-check{border-top:1px solid var(--line)}.ds-check-t{font-weight:620;letter-spacing:-.01em}.ds-check-b{margin-top:2px;font-size:.9375rem;color:var(--fg-2)}"
+    },
+    {
+      "name": "Review Comment",
+      "kind": "card",
+      "refersTo": "review-comment",
+      "description": "Explanations written as an inline review comment.",
+      "html": "<article class=\"ds-comment\"><p class=\"ds-author\"><strong>diditbreak</strong> commented</p><h3 class=\"ds-comment-t\">Run the real tasks</h3><p class=\"ds-comment-b\">Each setup runs in its own <code>git worktree</code>.</p></article>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-comment{padding:18px 20px 20px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);color:var(--fg);font-family:var(--sans)}.ds-comment p,.ds-comment h3{margin:0}.ds-author{font-size:.8125rem;color:var(--fg-3)}.ds-author strong{font-weight:640;color:var(--fg)}.ds-comment-t{margin-top:12px;font-size:1.3rem;font-weight:720;font-variation-settings:'wdth' 112;line-height:1.2;letter-spacing:-.02em}.ds-comment-b{margin-top:10px;color:var(--fg-2);line-height:1.6}.ds-comment-b code{font-family:var(--mono);font-size:.84em;padding:.1em .35em;border-radius:4px;background:var(--bar-strong)}"
+    },
+    {
+      "name": "Terminal",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Terminal panel with a path bar and printed output, on the dark theme.",
+      "html": "<figure class=\"ds-term\"><div class=\"ds-term-bar\"><code>~/context-demo</code><span>zsh</span></div><div class=\"ds-term-screen\"><div class=\"ds-term-line ds-term-prompt\"><span class=\"ds-dollar\">$ </span>diditbreak compare</div><div class=\"ds-term-line\">working vs HEAD   cost +36%</div></div></figure>",
+      "css": ":host{--fg:#ededed;--fg-2:#ababab;--fg-3:#858585;--line:#222;--line-2:#333;--surface:#111;--bar:#181818;--mono:'Martian Mono',ui-monospace,Menlo,monospace} .ds-term{margin:0;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);box-shadow:0 1px 0 rgb(255 255 255 / .03),0 28px 56px -28px rgb(0 0 0 / .9);overflow:hidden}.ds-term-bar{display:flex;justify-content:space-between;align-items:center;height:42px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--bar);font-size:.75rem;color:var(--fg-3);font-family:var(--mono)}.ds-term-screen{padding:20px 0 24px;font-family:var(--mono);font-variation-settings:'wdth' 87.5;font-size:.78rem;line-height:1.85}.ds-term-line{padding:0 22px;white-space:pre;color:var(--fg-2)}.ds-term-prompt{color:var(--fg)}.ds-dollar{color:var(--fg-3)}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Sticky 64px nav that takes the theme of the section beneath it.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-brand\" href=\"#\">diditbreak</a><nav class=\"ds-links\"><a href=\"#\">How it works</a><a href=\"#\">What it measures</a><a href=\"#\">Safety</a></nav></header>",
+      "css": ":host{--bg:#f5f5f5;--fg:#0a0a0a;--fg-2:#474747;--fg-3:#6e6e6e;--line:#e1e1e1;--line-2:#cbcbcb;--surface:#fff;--bar:#f0f0f0;--bar-strong:#e4e4e4;--solid:#0a0a0a;--on-solid:#f5f5f5;--ease-out:cubic-bezier(0.16,1,0.3,1);--mono:'Martian Mono',ui-monospace,Menlo,monospace;--sans:Archivo,ui-sans-serif,system-ui,sans-serif;--shadow:0 1px 0 rgb(0 0 0 / .04),0 28px 56px -28px rgb(0 0 0 / .22)} .ds-nav{display:flex;align-items:center;gap:32px;height:64px;padding:0 24px;background:var(--bg);color:var(--fg);border-bottom:1px solid var(--line);transition:background-color 360ms var(--ease-out),color 360ms var(--ease-out)}.ds-brand{font-family:var(--mono);font-variation-settings:'wdth' 87.5;font-size:.95rem;font-weight:600;letter-spacing:-.02em;color:inherit;text-decoration:none}.ds-links{display:flex;gap:28px}.ds-links a{font-family:var(--sans);font-size:.875rem;color:var(--fg-2);text-decoration:none;transition:color 200ms ease}.ds-links a:hover{color:var(--fg)}.ds-links a:focus-visible{outline:2px solid var(--fg);outline-offset:3px;border-radius:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Code Review",
+    "overview": "The whole page is read as one pull request: a context-file change at the top, the agent's changed behaviour beneath it, then the checks, the evidence thread, and the merge box. Every component is borrowed from the grammar developers already read daily in review tools and terminals: line-number gutters, `+`/`−` markers, `@@` hunk headers, fold rows, diffstat blocks, CI check rows, inline review comments. Nothing is decorated; everything is a review artefact carrying real content.\n\nThe palette has no hue at all. Light sections are the review page (paper `#f5f5f5`, white files); dark sections are the terminal (near-black `#0a0a0a`, `#111111` files). Sections alternate between the two themes and every component re-derives its colours from the theme of the section it sits in, so the same diff, chip, or check row works on either. Change is shown by inversion, solid fills, outlines, and hatching, never by red and green.\n\nDensity is that of a working tool rather than a brochure: generous section breathing room (96 to 168px) around tight, information-dense panels with hairline rules. Motion is scroll-revealed and narrative: changes land line by line, checks spin and resolve, terminal output prints. With reduced motion or no JavaScript, every element is simply in its final state.",
+    "keyCharacteristics": [
+      "Pure neutrals, two themes (`data-theme=\"light\"` review page, `data-theme=\"dark\"` terminal), alternating by section.",
+      "Diff grammar as the single component language.",
+      "Inversion, outline, and hatch in place of colour for add/remove/absent.",
+      "Wide-axis Archivo headings against narrowed Martian Mono code.",
+      "Hairline borders and bar fills carry structure; one soft lift on file-like panels.",
+      "Scroll reveals that never hide content before it has been seen."
+    ],
+    "rules": [
+      {
+        "name": "The No Hue Rule",
+        "body": "Every colour is a neutral grey. No accent, no tinted neutral, no red/green diff colouring, no gradients. This is a binding brand constraint.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inversion Rule",
+        "body": "An addition is a solid fill, a removal is an outline, an absent line is hatched (strokes `#e2e2e2` on light, `#1f1f1f` on dark). The exact changed token inside a line is inverted (ink on paper becomes paper on ink).",
+        "section": "colors"
+      },
+      {
+        "name": "The Theme Follows the Section Rule",
+        "body": "Components never hard-code a theme. They read `--bg`, `--fg`, `--fg-2`, `--fg-3`, `--line`, `--line-2`, `--surface`, `--bar`, `--bar-strong`, `--solid`, `--on-solid` and `--shadow` from the nearest `data-theme`. The sticky nav adopts the theme of the section beneath it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Width Contrast Rule",
+        "body": "Headings are wide Archivo (`wdth` 112), code is narrow Martian Mono (`wdth` 87.5). Do not set headings at default width or code at full width.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Labels, meta and column heads are sentence case with slightly negative tracking. There are no uppercase, letter-spaced labels anywhere in the system.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Lift Rule",
+        "body": "Only whole artefacts and the primary command chip are lifted. Comments, code blocks, rows and inline elements stay flat on hairlines.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** express every new section as a review artefact: a diff file, a check panel, a review comment thread, a terminal, or a hairline table.",
+      "**Do** mark additions with solid fill, removals with an outline, and absent lines with hatching; invert the exact changed token.",
+      "**Do** place every component under a `data-theme` section and read colours from the theme variables, so it works on both review and terminal sections.",
+      "**Do** alternate light and dark sections.",
+      "**Do** set headings in wide Archivo (`wdth` 112, 720 to 760, -0.03 to -0.038em) and code in narrowed Martian Mono (`wdth` 87.5).",
+      "**Do** keep reveals content-safe: visible by default, pending only below the fold, final state under reduced motion or without JavaScript.",
+      "**Do** draw icons on the 16px, 1.5px-stroke, round-cap grid in `currentColor`."
+    ],
+    "donts": [
+      "**Don't** introduce any hue: no accent colours, tinted greys, or red/green diff colouring.",
+      "**Don't** use gradients, including gradient text or gradient backgrounds.",
+      "**Don't** add uppercase letter-spaced labels or kickers above headings; the heading stands alone.",
+      "**Don't** lift anything other than whole artefacts and the command chip; no shadowed cards for comments, rows or inline elements.",
+      "**Don't** use radii outside the 3 / 4 / 8 / 10 / 12px ladder and full circles.",
+      "**Don't** hard-code a theme colour inside a component that might sit in either section theme."
+    ]
+  }
+}

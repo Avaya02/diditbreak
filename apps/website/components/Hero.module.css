@@ -1,0 +1,283 @@
+.hero {
+  padding-top: clamp(20px, 2.2vw, 40px);
+  padding-bottom: clamp(88px, 10vw, 140px);
+}
+
+.title {
+  font-size: var(--fs-display);
+  line-height: 0.96;
+  letter-spacing: -0.038em;
+  font-weight: 760;
+}
+
+/* Two lines on wide screens: "Did your CLAUDE.md edit / break your agent?" */
+.keep {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .keep {
+    white-space: normal;
+  }
+}
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 40px;
+  margin-top: clamp(14px, 1.4vw, 24px);
+}
+
+.lead {
+  font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.1875rem);
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 560;
+  text-decoration: none;
+}
+
+.secondary span {
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 200ms ease;
+}
+
+.secondary:hover span {
+  text-decoration-color: currentColor;
+}
+
+.arrow {
+  transition: transform 260ms var(--ease-out);
+}
+
+.secondary:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+.review {
+  margin-top: clamp(16px, 1.6vw, 28px);
+}
+
+.review :global([class*="unfold"]),
+.review :global([class*="hunk"]) {
+  padding-block: 3px;
+}
+
+/* The first-viewport review runs a little denser than the diffs further down. */
+.review :global([data-kind]) {
+  line-height: 1.75;
+}
+
+.rule {
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.28em;
+}
+
+.provenance {
+  max-width: 82ch;
+  margin-top: 14px;
+  font-size: var(--fs-small);
+  color: var(--fg-3);
+}
+
+/* The verdict: a check row that resolves once the change has landed. */
+.status {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.statusIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+}
+
+.spinner,
+.done {
+  grid-area: 1 / 1;
+}
+
+.done {
+  width: 16px;
+  height: 16px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-2);
+  border-top-color: var(--fg);
+  opacity: 0;
+}
+
+.statusBody {
+  display: grid;
+  min-width: 0;
+}
+
+.statusRunning,
+.statusResult {
+  grid-area: 1 / 1;
+  font-size: 0.875rem;
+}
+
+.statusRunning {
+  color: var(--fg-3);
+  opacity: 0;
+}
+
+.statusResult {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  color: var(--fg-2);
+}
+
+.statusResult strong {
+  color: var(--fg);
+  font-weight: 640;
+}
+
+.details {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 560;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.details svg {
+  transition: transform 260ms var(--ease-out);
+}
+
+.details:hover svg {
+  transform: translateX(3px);
+}
+
+/*
+ * With motion: the verdict waits until the review is in view (data-play),
+ * spins while the change lands, then resolves. Without motion it is simply
+ * shown in its final state.
+ */
+:global(.motion) .review:not([data-play]) .done {
+  opacity: 0;
+}
+
+:global(.motion) .review:not([data-play]) .statusResult {
+  clip-path: inset(0 100% 0 0);
+}
+
+:global(.motion) .review[data-play] .spinner {
+  animation:
+    spin 700ms linear infinite,
+    showThenHide var(--verdict) step-end both;
+}
+
+:global(.motion) .review[data-play] .statusRunning {
+  animation: showThenHide var(--verdict) step-end both;
+}
+
+:global(.motion) .review[data-play] .done {
+  animation: arrive 500ms var(--ease-out) both;
+  animation-delay: var(--verdict);
+}
+
+:global(.motion) .review[data-play] .statusResult {
+  animation: write 900ms var(--ease-out) both;
+  animation-delay: var(--verdict);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .title {
+    animation: rise 1100ms var(--ease-out) both;
+  }
+
+  .intro {
+    animation: rise 1100ms var(--ease-out) both;
+    animation-delay: 120ms;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Visible from a short moment in until the verdict lands. */
+@keyframes showThenHide {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0.001;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+
+@media (max-width: 760px) {
+  .status {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .details {
+    grid-column: 2;
+  }
+}

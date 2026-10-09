@@ -1,0 +1,219 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px clamp(40px, 5vw, 80px);
+  align-items: start;
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: 1.02;
+  max-width: 12ch;
+}
+
+@media (max-width: 900px) {
+  .title {
+    max-width: none;
+  }
+}
+
+.lead {
+  margin-top: 24px;
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--fg-2);
+  max-width: 40ch;
+}
+
+.panel {
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  background: var(--bar);
+  border-bottom: 1px solid var(--line);
+}
+
+.summaryText {
+  display: grid;
+}
+
+.running,
+.passed {
+  grid-area: 1 / 1;
+  display: grid;
+}
+
+.running {
+  opacity: 0;
+}
+
+.summaryText strong {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.summaryNote {
+  font-size: 0.8125rem;
+  color: var(--fg-3);
+}
+
+.badge,
+.icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+}
+
+.badge svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.badge {
+  width: 32px;
+  height: 32px;
+  background: var(--solid);
+  color: var(--on-solid);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  background: var(--solid);
+  color: var(--on-solid);
+}
+
+.icon svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+}
+
+.spin,
+.tick {
+  grid-area: 1 / 1;
+}
+
+.spin {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--fg) 25%, transparent);
+  border-top-color: var(--fg);
+  opacity: 0;
+}
+
+.list {
+  padding: 6px 0;
+}
+
+.item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 22px;
+}
+
+.item + .item {
+  border-top: 1px solid var(--line);
+}
+
+.itemTitle {
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.itemBody {
+  margin-top: 2px;
+  font-size: 0.9375rem;
+  color: var(--fg-2);
+}
+
+/*
+ * Each check runs, then resolves, one after another, the way a pull request's
+ * checks complete. Only for checks first seen while scrolling; the rows stay
+ * visible throughout, only their status changes.
+ */
+:global(.motion) .panel [data-reveal="check"],
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) {
+  opacity: 1;
+  transition: none;
+}
+
+:global(.motion) .panel [data-reveal="check"] .spin {
+  animation: spin 700ms linear infinite;
+  transition: opacity 200ms ease;
+  transition-delay: calc(var(--i, 0) * 260ms + 650ms);
+}
+
+:global(.motion) .panel [data-reveal="check"] .tick {
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 500ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 260ms + 650ms);
+}
+
+:global(.motion) .panel [data-reveal="check"] .badge,
+:global(.motion) .panel [data-reveal="check"] .icon {
+  transition:
+    background-color 300ms var(--ease-out),
+    box-shadow 300ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 260ms + 650ms);
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .spin {
+  opacity: 1;
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .tick {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .badge,
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .icon {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--line-2);
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-in) .spin {
+  opacity: 0;
+}
+
+:global(.motion) .panel [data-reveal="check"] .running,
+:global(.motion) .panel [data-reveal="check"] .passed {
+  transition: opacity 300ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 260ms + 650ms);
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .running {
+  opacity: 1;
+}
+
+:global(.motion) .panel [data-reveal="check"]:global(.is-pending) .passed {
+  opacity: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
