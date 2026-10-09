@@ -1,29 +1,29 @@
 {
   "name": "diditbreak",
   "version": "0.1.0",
-  "description": "Regression tests for LLM prompts. Deterministic checks run free; an LLM judge runs only when needed.",
+  "description": "Did your CLAUDE.md change make your coding agent better or worse? Runs real tasks under each context setup and measures success, cost and confusion.",
   "keywords": [
-    "llm",
-    "prompt",
-    "testing",
-    "regression",
+    "claude-code",
+    "claude-md",
+    "agents-md",
+    "coding-agent",
+    "ai-agents",
     "evals",
+    "context-engineering",
+    "llm",
     "cli",
-    "ci",
-    "openai",
-    "anthropic",
-    "ollama"
+    "ci"
   ],
   "license": "MIT",
   "author": "Avaya Sharma",
-  "homepage": "https://github.com/Avaya02/PromptGuard#readme",
+  "homepage": "https://github.com/Avaya02/diditbreak#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Avaya02/PromptGuard.git",
+    "url": "git+https://github.com/Avaya02/diditbreak.git",
     "directory": "packages/cli"
   },
   "bugs": {
-    "url": "https://github.com/Avaya02/PromptGuard/issues"
+    "url": "https://github.com/Avaya02/diditbreak/issues"
   },
   "type": "module",
   "bin": {

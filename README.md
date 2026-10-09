@@ -1,6 +1,6 @@
 # diditbreak
 
-[![CI](https://github.com/Avaya02/PromptGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/Avaya02/PromptGuard/actions/workflows/ci.yml)
+[![CI](https://github.com/Avaya02/diditbreak/actions/workflows/ci.yml/badge.svg)](https://github.com/Avaya02/diditbreak/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/diditbreak)](https://www.npmjs.com/package/diditbreak)
 
 **Did your CLAUDE.md change make your coding agent better or worse?**
@@ -17,6 +17,8 @@ cd diditbreak-demo
 npx diditbreak compare --agent mock   # free and offline (simulated numbers)
 npx diditbreak compare                # real Claude Code runs; asks before spending
 ```
+
+Needs Node 20+ and git, on macOS or Linux (on Windows, use WSL). Real runs also need [Claude Code](https://docs.anthropic.com/en/docs/claude-code), logged in or with `ANTHROPIC_API_KEY` set.
 
 ## A real result
 
@@ -187,4 +189,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-MIT
+[MIT](LICENSE)
