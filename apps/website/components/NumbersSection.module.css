@@ -1,0 +1,29 @@
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 24px 64px;
+  align-items: end;
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: 1.02;
+  max-width: 15ch;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--fg-2);
+  max-width: 44ch;
+}
+
+.figure {
+  margin-top: clamp(48px, 6vw, 80px);
+}
+
+@media (max-width: 860px) {
+  .head {
+    grid-template-columns: 1fr;
+  }
+}

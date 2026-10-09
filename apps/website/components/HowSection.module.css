@@ -1,0 +1,242 @@
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 24px 64px;
+  align-items: end;
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: 1.02;
+  max-width: 14ch;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--fg-2);
+  max-width: 44ch;
+}
+
+.files {
+  margin-top: clamp(56px, 7vw, 96px);
+}
+
+.step {
+  --gap: clamp(32px, 4vw, 64px);
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 24px var(--gap);
+  align-items: start;
+  padding-block: clamp(28px, 3.5vw, 44px);
+}
+
+/* The explanation is a review comment, joined to its file by a hairline. */
+.comment {
+  position: relative;
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.comment::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: calc(-1 * var(--gap) - 1px);
+  width: var(--gap);
+  border-top: 1px solid var(--line-2);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--fg-3);
+}
+
+.author strong {
+  font-weight: 640;
+  color: var(--fg);
+}
+
+.avatar {
+  width: 16px;
+  height: 16px;
+  color: var(--fg);
+}
+
+.stepTitle {
+  margin-top: 12px;
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.stepBody {
+  margin-top: 10px;
+  color: var(--fg-2);
+}
+
+.stepBody code,
+.gridNote code {
+  font-size: 0.84em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--bar-strong);
+  color: var(--fg);
+}
+
+.stepFile {
+  min-width: 0;
+}
+
+.tree {
+  padding: 16px 18px 18px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variation-settings: var(--mono-width);
+  font-size: var(--fs-code);
+  line-height: 2;
+}
+
+.treeRoot {
+  display: block;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+
+/* Tree guides drawn as hairlines: a trunk, and a branch into each entry. */
+.treeList {
+  position: relative;
+  margin-left: 6px;
+  padding-left: 22px;
+}
+
+.treeList::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: calc(100% - 1em);
+  border-left: 1px solid var(--line-2);
+}
+
+.treeRow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 24px;
+}
+
+.treeRow::before {
+  content: "";
+  position: absolute;
+  left: -22px;
+  top: 1em;
+  width: 14px;
+  border-top: 1px solid var(--line-2);
+}
+
+.treeRow span {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-variation-settings: normal;
+  font-size: 0.8125rem;
+  color: var(--fg-3);
+}
+
+.grid {
+  padding: 8px 18px 18px;
+}
+
+.gridHead,
+.gridRow {
+  display: grid;
+  grid-template-columns: 5.5rem repeat(4, minmax(0, 1fr)) 5rem;
+  align-items: center;
+  gap: 10px;
+}
+
+.gridHead {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--fg-3);
+}
+
+.gridHead span:last-child,
+.cost {
+  text-align: right;
+}
+
+.gridRow {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.gridRow code {
+  font-size: var(--fs-code);
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  border-radius: 6px;
+}
+
+.cell[data-passed="true"] {
+  background: var(--solid);
+  color: var(--on-solid);
+}
+
+.cell[data-passed="false"] {
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1.5px var(--fg);
+}
+
+.cost {
+  color: var(--fg-2);
+}
+
+.gridNote {
+  margin-top: 14px;
+  font-size: 0.8125rem;
+  color: var(--fg-3);
+}
+
+@media (max-width: 980px) {
+  .head,
+  .step {
+    grid-template-columns: 1fr;
+  }
+
+  .comment::after {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Every note on its own line under its path, so they align. */
+  .treeRow {
+    flex-direction: column;
+  }
+
+  .gridHead,
+  .gridRow {
+    grid-template-columns: 4.2rem repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .gridHead span:last-child,
+  .cost {
+    display: none;
+  }
+
+  .gridHead {
+    font-size: 0.6875rem;
+  }
+}

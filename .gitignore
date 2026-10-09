@@ -3,3 +3,7 @@ dist
 coverage
 .env
 .DS_Store
+
+# Impeccable design-session scratch: decision-page state and review captures.
+.impeccable/questions/
+**/.impeccable/review/

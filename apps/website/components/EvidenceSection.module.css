@@ -1,0 +1,162 @@
+.file {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+/* An inline review thread under the line it is about. */
+.thread {
+  display: grid;
+  gap: 16px;
+  padding: clamp(20px, 3vw, 36px);
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.comment,
+.reply {
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.comment {
+  padding: clamp(22px, 3.2vw, 44px);
+}
+
+.author {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 0.875rem;
+  color: var(--fg-3);
+}
+
+.author a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.author cite {
+  font-style: normal;
+  font-weight: 620;
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 200ms ease;
+}
+
+.author a:hover cite {
+  text-decoration-color: currentColor;
+}
+
+.out {
+  color: var(--fg-3);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--solid);
+  color: var(--on-solid);
+}
+
+.avatar svg {
+  width: 14px;
+  height: 14px;
+}
+
+.meta {
+  color: var(--fg-3);
+}
+
+.quote {
+  position: relative;
+  margin-top: clamp(24px, 3vw, 40px);
+  font-size: clamp(1.7rem, 0.95rem + 2.5vw, 3.25rem);
+  line-height: 1.12;
+  font-weight: 640;
+  font-variation-settings: var(--wide);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.open {
+  position: absolute;
+  left: -0.55em;
+  color: var(--fg-3);
+}
+
+.word {
+  display: inline-block;
+}
+
+.mark {
+  padding: 0 0.18em 0.04em;
+  border-radius: 0.12em;
+  background: var(--solid);
+  color: var(--on-solid);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition:
+    background-color 600ms var(--ease-out),
+    color 600ms var(--ease-out);
+  transition-delay: 900ms;
+}
+
+:global(.motion) .quote:has(:global(.is-pending)) .mark {
+  background: transparent;
+  color: inherit;
+}
+
+.more {
+  margin-top: clamp(20px, 2.6vw, 32px);
+  max-width: 64ch;
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+.reply {
+  display: grid;
+  gap: 8px;
+  padding: 16px 20px;
+  max-width: 640px;
+}
+
+.reply .author strong {
+  font-weight: 640;
+  color: var(--fg);
+}
+
+.replyMark {
+  width: 18px;
+  height: 18px;
+  color: var(--fg);
+}
+
+.replyBody {
+  font-size: 0.9375rem;
+  color: var(--fg-2);
+}
+
+.replyBody code {
+  font-size: 0.86em;
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+  background: var(--solid);
+  color: var(--on-solid);
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .open {
+    position: static;
+  }
+}

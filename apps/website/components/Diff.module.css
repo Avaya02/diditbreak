@@ -1,0 +1,316 @@
+.file {
+  position: relative;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.fileHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 16px;
+  background: var(--bar);
+  border-bottom: 1px solid var(--line);
+}
+
+.chevron {
+  flex: none;
+  color: var(--fg-3);
+}
+
+.fileName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileMeta {
+  margin-left: auto;
+  padding-left: 16px;
+  font-size: 0.75rem;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variation-settings: var(--mono-width);
+  font-size: 0.75rem;
+  color: var(--fg-2);
+}
+
+.statNumbers {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.blocks {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.blocks i {
+  width: 8px;
+  height: 8px;
+  border-radius: 1.5px;
+  background: var(--line-2);
+}
+
+.blocks i[data-kind="add"] {
+  background: var(--fg);
+}
+
+.blocks i[data-kind="del"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.25px var(--fg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variation-settings: var(--mono-width);
+  font-size: var(--fs-code);
+  line-height: 1.95;
+}
+
+.side {
+  display: grid;
+  grid-template-columns: 3.4em 1.6em minmax(0, 1fr) auto;
+  align-items: start;
+  min-height: 2em;
+  padding-right: 14px;
+}
+
+.side[data-side="new"] {
+  border-left: 1px solid var(--line);
+}
+
+.num {
+  padding-right: 10px;
+  text-align: right;
+  color: var(--fg-3);
+  font-size: 0.92em;
+  user-select: none;
+}
+
+.marker {
+  text-align: center;
+  font-weight: 700;
+  user-select: none;
+}
+
+.code {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--fg);
+}
+
+.aside {
+  padding-left: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Added and changed lines: a bar, a darker gutter, the marker. */
+.row[data-kind="add"] .side[data-side="new"],
+.row[data-kind="change"] .side {
+  background: var(--bar);
+}
+
+.row[data-kind="add"] .side[data-side="new"] .num,
+.row[data-kind="change"] .side .num {
+  background: var(--bar-strong);
+  color: var(--fg-2);
+}
+
+.row[data-kind="change"] .side[data-side="old"] .code {
+  color: var(--fg-2);
+}
+
+/* No line on this side: hatched, as split diffs mark an absent line. */
+.side[data-empty] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M-2 2 2-2M0 8 8 0M6 10l4-4' stroke='%23e2e2e2' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+:global([data-theme="dark"]) .side[data-empty] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M-2 2 2-2M0 8 8 0M6 10l4-4' stroke='%231f1f1f' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+.hunk {
+  padding: 5px 16px 5px calc(5em + 4px);
+  background: var(--bar-strong);
+  border-block: 1px solid var(--line);
+  font-size: var(--fs-code);
+  line-height: 1.8;
+  color: var(--fg-2);
+}
+
+.hunk code {
+  font-size: inherit;
+}
+
+.unfold {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px calc(3.4em + 2px);
+  background: var(--bar);
+  border-block: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--fg-3);
+}
+
+.token {
+  white-space: nowrap;
+  padding: 0.08em 0.32em;
+  border-radius: 3px;
+  background: var(--solid);
+  color: var(--on-solid);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.unified {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variation-settings: var(--mono-width);
+  font-size: var(--fs-code);
+  line-height: 1.95;
+  padding-block: 6px;
+}
+
+.unifiedRow {
+  display: grid;
+  grid-template-columns: 3.4em 1.6em minmax(0, 1fr);
+  padding-right: 16px;
+}
+
+.unifiedRow[data-kind="add"] {
+  background: var(--bar);
+}
+
+.unifiedRow[data-kind="add"] .num {
+  background: var(--bar-strong);
+  color: var(--fg-2);
+}
+
+/*
+ * The change landing: the marker arrives, the line writes in from the gutter,
+ * and the replaced line on the left takes its removed state. It waits for its
+ * scope to come into view ([data-play], set before hydration), so it is seen
+ * rather than played off screen. Without motion every row is in its final
+ * state from the start.
+ */
+:global(.motion) [data-apply-scope]:not([data-play]) .row[data-apply] .side[data-side="new"],
+:global(.motion) [data-apply-scope]:not([data-play]) .row[data-apply][data-kind="change"] .side[data-side="old"] {
+  background-color: var(--surface);
+}
+
+:global(.motion) [data-apply-scope]:not([data-play]) .row[data-apply] .side[data-side="new"] > *,
+:global(.motion) [data-apply-scope]:not([data-play]) .row[data-apply][data-kind="change"] .side[data-side="old"] .marker {
+  opacity: 0;
+}
+
+:global(.motion) [data-play] .row[data-apply] .side[data-side="new"] {
+  animation: settleBar 900ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+:global(.motion) [data-play] .row[data-apply] .side[data-side="new"] .num {
+  animation: fadeIn 400ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+:global(.motion) [data-play] .row[data-apply] .side[data-side="new"] .marker {
+  animation: arrive 460ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+:global(.motion) [data-play] .row[data-apply] .side[data-side="new"] .code,
+:global(.motion) [data-play] .row[data-apply] .side[data-side="new"] .aside {
+  animation: write 820ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0ms) + 90ms);
+}
+
+:global(.motion) [data-play] .row[data-apply][data-kind="change"] .side[data-side="old"] {
+  animation: settleBar 700ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0ms) - 120ms);
+}
+
+:global(.motion) [data-play] .row[data-apply][data-kind="change"] .side[data-side="old"] .marker {
+  animation: arrive 420ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0ms) - 120ms);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes settleBar {
+  from {
+    background-color: var(--surface);
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Under 760px a split diff reads as unified: one column, old line above new. */
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .side[data-side="new"] {
+    border-left: 0;
+  }
+
+  .row[data-kind="context"] .side[data-side="old"],
+  .side[data-empty] {
+    display: none;
+  }
+
+  .hunk {
+    padding-left: 16px;
+  }
+
+  .fileMeta {
+    display: none;
+  }
+
+  /* A trailing note moves under its line instead of squeezing it. */
+  .side {
+    grid-template-columns: 3.4em 1.6em minmax(0, 1fr);
+  }
+
+  .aside {
+    grid-column: 3;
+    padding-left: 0;
+  }
+}
