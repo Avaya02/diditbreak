@@ -44,13 +44,18 @@ const EXAMPLE_TASK = `# A task for your coding agent. diditbreak runs it in a fr
 prompt: |
   Add a --version flag to the CLI that prints the version from package.json.
 
-# Commands that must all exit 0 after the agent finishes. Prefer checks the
-# agent cannot see or edit (it never sees this file), so it cannot game them.
+# Commands that must all exit 0 after the agent finishes. At least one must
+# fail until the task is done: an existing test suite usually passes before the
+# agent starts, so on its own it cannot tell success from doing nothing.
+# diditbreak checks this before spending anything. The agent never sees this
+# file, so it cannot write code aimed at the check.
 verify:
   - npm test
+  - node cli.js --version | grep -qF "$(node -p 'require("./package.json").version')"
 
 # Behaviour rules, checked against what the agent actually did.
 checks:
+  must_change: cli.js
   must_not_change: package-lock.json
   forbid_commands: [git push, npm publish]
   # expect_skills: my-skill      # a skill this task should trigger

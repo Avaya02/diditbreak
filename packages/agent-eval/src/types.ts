@@ -119,6 +119,12 @@ export interface AgentRunResult {
   /** False when the agent crashed, timed out, or hit a turn or budget limit. */
   completed: boolean;
   error?: string | undefined;
+  /**
+   * The agent never got a fair attempt: it could not start, could not
+   * authenticate, or the model API failed. Such runs say nothing about the
+   * context, so they are left out of the numbers instead of counted as failures.
+   */
+  infraError?: boolean | undefined;
   finalMessage: string;
   turns: number;
   durationMs: number;
@@ -147,10 +153,17 @@ export interface AgentRunInput {
   /** Context the variant laid down, for the mock agent's decisions. */
   context: { paths: string[]; text: string };
   mock?: MockScript | undefined;
+  /** Aborted when the experiment is interrupted; the agent must stop promptly. */
+  signal?: AbortSignal | undefined;
 }
 
 export interface AgentAdapter {
   readonly name: AgentName;
+  /**
+   * Checks the agent can start at all, before anything is spent. Throws
+   * AgentUnavailableError with a fix when it cannot.
+   */
+  preflight?(): Promise<{ version?: string | undefined }>;
   run(input: AgentRunInput): Promise<AgentRunResult>;
 }
 
@@ -167,7 +180,11 @@ export interface VerifyOutcome {
   output: string;
 }
 
-export type FailureReason = "agent-error" | "verify-failed" | "check-failed" | null;
+/**
+ * Why a trial did not pass. "infra-error" means the trial could not run at all
+ * (see AgentRunResult.infraError) and is excluded from pass rates.
+ */
+export type FailureReason = "agent-error" | "verify-failed" | "check-failed" | "infra-error" | null;
 
 export interface TrialResult {
   variant: string;
@@ -184,9 +201,21 @@ export interface TrialResult {
   transcriptPath: string;
 }
 
+/**
+ * "running" is written while the experiment is in progress, so a file still
+ * saying it was left by a run that crashed or was killed. "stopped" means
+ * diditbreak stopped early because runs could not start (see stopReason).
+ */
+export type ExperimentStatus = "running" | "complete" | "interrupted" | "stopped";
+
 export interface ExperimentResult {
   schemaVersion: 1;
   id: string;
+  /** Absent in results written before statuses existed, which were always complete. */
+  status?: ExperimentStatus | undefined;
+  stopReason?: string | undefined;
+  /** Runs the plan called for; results holds only the ones that finished. */
+  plannedRuns?: number | undefined;
   startedAt: string;
   durationMs: number;
   agent: AgentConfig;

@@ -1,4 +1,4 @@
-import type { Comparison, ExperimentResult, ExperimentSummary, VariantSummary } from "@diditbreak/agent-eval";
+import type { Comparison, ExperimentResult, ExperimentSummary, Interval, VariantSummary } from "@diditbreak/agent-eval";
 import { stripVTControlCharacters } from "node:util";
 
 import chalk from "chalk";
@@ -77,13 +77,27 @@ const VERDICT_TEXT = {
   "no-clear-difference": chalk.yellow("no clear difference")
 } as const;
 
+/**
+ * "cost +36% (+12 … +60%)". Highlighted only when the interval excludes zero:
+ * an increase in red, a decrease in green. Otherwise it could be noise.
+ */
+function change(name: string, value: number | null, interval: Interval | null): string {
+  if (value === null) {
+    return chalk.dim(`${name} n/a`);
+  }
+  const text = `${name} ${signedPercent(value)}${interval ? ` (${signedPercent(interval.low)} … ${signedPercent(interval.high)})` : ""}`;
+  if (interval === null || (interval.low <= 0 && interval.high >= 0)) {
+    return chalk.dim(text);
+  }
+  return interval.low > 0 ? chalk.red(text) : chalk.green(text);
+}
+
 function verdictLine(comparison: Comparison, nameWidth: number, label: string | undefined): string[] {
   const { passRate } = comparison;
-  const interval = `95% CI ${points(passRate.low)} … ${points(passRate.high)} pts`;
-  const head = `   ${pad(comparison.variant, nameWidth)}  ${pad(`${points(passRate.mean)} pts`, 9)} ${chalk.dim(pad(`(${interval})`, 28))} ${VERDICT_TEXT[comparison.verdict]}`;
-  const effects = chalk.dim(
-    `${" ".repeat(nameWidth + 5)}cost ${signedPercent(comparison.costChange)} · turns ${signedPercent(comparison.turnsChange)} · starting context ${signedTokens(comparison.contextTokensChange)} tokens`
-  );
+  const interval = `(${points(passRate.low)} … ${points(passRate.high)})`;
+  const head = `   ${pad(comparison.variant, nameWidth)}  ${pad(`${points(passRate.mean)} pts`, 9)} ${chalk.dim(pad(interval, 14))} ${VERDICT_TEXT[comparison.verdict]}`;
+  const indent = " ".repeat(nameWidth + 5);
+  const effects = `${indent}${change("cost", comparison.costChange, comparison.costChangeInterval)}${chalk.dim(" · ")}${change("turns", comparison.turnsChange, comparison.turnsChangeInterval)}${chalk.dim(` · starting context ${signedTokens(comparison.contextTokensChange)} tokens`)}`;
   const lines = [head, effects];
   if (label) {
     lines.splice(1, 0, chalk.dim(`${" ".repeat(nameWidth + 5)}removes ${label}`));
@@ -107,6 +121,13 @@ function failureBreakdown(variant: VariantSummary): string | null {
 }
 
 /**
+ * Below this many tasks, resampling them has too few distinct outcomes for the
+ * intervals to be trusted beyond the tasks themselves. A rule of thumb, stated
+ * as one in the report.
+ */
+const FEW_TASKS = 5;
+
+/**
  * The comparison report: one row per setup, a verdict per setup against the
  * reference, then why runs failed and which behaviour rules broke.
  */
@@ -119,12 +140,25 @@ export function printCompareReport(input: CompareReportInput): void {
     ? "mock agent"
     : `${experiment.agent.name} (${experiment.agent.model ?? "default model"})`;
 
+  const status = experiment.status ?? "complete";
+  const runs =
+    status !== "complete" && experiment.plannedRuns !== undefined
+      ? `${experiment.results.length} of ${experiment.plannedRuns} runs`
+      : `${experiment.results.length} runs`;
+
   write("");
   write(
     chalk.dim(
-      ` diditbreak · ${agentLabel} · ${experiment.tasks.length} task${experiment.tasks.length === 1 ? "" : "s"} × ${experiment.trials} trial${experiment.trials === 1 ? "" : "s"} · ${experiment.results.length} runs · ${duration(experiment.durationMs)}`
+      ` diditbreak · ${agentLabel} · ${experiment.tasks.length} task${experiment.tasks.length === 1 ? "" : "s"} × ${experiment.trials} trial${experiment.trials === 1 ? "" : "s"} · ${runs} · ${duration(experiment.durationMs)}`
     )
   );
+  if (status === "interrupted") {
+    write(chalk.yellow(" Interrupted: the numbers cover only the runs that finished."));
+  } else if (status === "running") {
+    write(chalk.yellow(" Incomplete: this experiment never finished (it crashed or was killed). The numbers cover only the runs that finished."));
+  } else if (status === "stopped") {
+    write(chalk.red(" Stopped early: runs could not start."));
+  }
   write("");
   write(
     chalk.dim(
@@ -134,17 +168,32 @@ export function printCompareReport(input: CompareReportInput): void {
 
   for (const variant of summary.variants) {
     const solved = `${variant.passed}/${variant.runs}`.padStart(5);
-    const rate = pct(variant.passRate).padStart(4);
+    const rate = (variant.runs === 0 ? "–" : pct(variant.passRate)).padStart(4);
     const colour = variant.name === summary.reference ? chalk.bold : (text: string) => text;
     write(
       ` ${colour(pad(variant.name, nameWidth))}  ${pad(`${solved}  ${rate}`, 14)} ${pad(money(variant.meanCostUsd), 9)} ${pad(variant.meanTurns === null ? "n/a" : variant.meanTurns.toFixed(1), 6)} ${pad(tokens(variant.meanContextTokens), 8)} ${duration(variant.meanDurationMs)}`
     );
   }
 
-  if (summary.comparisons.length > 0) {
+  // Verdicts drawn from runs that mostly never happened would be noise
+  // dressed as findings; the caller explains why there is no verdict instead.
+  if (summary.comparisons.length > 0 && summary.problems.length === 0) {
     write("");
-    write(` ${chalk.bold(`vs ${summary.reference}`)}`);
+    write(` ${chalk.bold(`vs ${summary.reference}`)}  ${chalk.dim("(95% intervals: one that spans zero could be noise)")}`);
+    if (experiment.tasks.length < FEW_TASKS) {
+      write(
+        chalk.dim(
+          `   With ${experiment.tasks.length} task${experiment.tasks.length === 1 ? "" : "s"}, intervals describe these tasks and can be too narrow; ${FEW_TASKS}+ tasks make them more reliable.`
+        )
+      );
+    }
+    const measured = new Map(summary.variants.map((variant) => [variant.name, variant.runs]));
     for (const comparison of summary.comparisons) {
+      // An interrupted experiment may not have reached every setup yet.
+      if (!measured.get(comparison.variant) || !measured.get(summary.reference)) {
+        write(`   ${pad(comparison.variant, nameWidth)}  ${chalk.dim("no finished runs on both sides to compare yet")}`);
+        continue;
+      }
       for (const line of verdictLine(comparison, nameWidth, input.labels?.[comparison.variant])) {
         write(line);
       }
@@ -159,6 +208,24 @@ export function printCompareReport(input: CompareReportInput): void {
     write(` ${chalk.bold("Why runs failed")}`);
     for (const [name, text] of breakdowns) {
       write(`   ${pad(name, nameWidth)}  ${text}`);
+    }
+  }
+
+  // Left out of every number above, so they must be visible here.
+  const unrunnable = summary.variants.filter((variant) => variant.couldNotRun > 0);
+  if (unrunnable.length > 0) {
+    write("");
+    write(` ${chalk.bold("Could not run")}  ${chalk.dim("(left out of the numbers above)")}`);
+    write(`   ${unrunnable.map((variant) => `${variant.name} ${variant.couldNotRun}`).join("   ")}`);
+    // Usually one cause for all of them, so each reason is listed once.
+    const reasons = new Map<string, number>();
+    for (const variant of unrunnable) {
+      for (const [reason, count] of Object.entries(variant.couldNotRunReasons)) {
+        reasons.set(reason, (reasons.get(reason) ?? 0) + count);
+      }
+    }
+    for (const [reason, count] of [...reasons].sort((a, b) => b[1] - a[1])) {
+      write(chalk.dim(`   ${count}× ${reason}`));
     }
   }
 

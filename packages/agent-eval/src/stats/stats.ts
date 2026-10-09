@@ -97,6 +97,69 @@ export function pairedBootstrap(
   };
 }
 
+/** Per-task measurements, such as cost per run, under the two setups being compared. */
+export interface PairedTaskValues {
+  reference: number[];
+  candidate: number[];
+}
+
+function average(values: number[]): number {
+  return values.reduce((total, value) => total + value, 0) / values.length;
+}
+
+/**
+ * Relative change in a measurement (candidate ÷ reference − 1), with the same
+ * two-level paired bootstrap as pass rates: tasks first, then runs within each.
+ *
+ * Runs are averaged within each task first, so a task that happened to finish
+ * more runs (after an interruption, say) does not outweigh the others. Returns null when no task has values under both setups, or the reference
+ * averages zero.
+ */
+export function pairedRelativeChange(
+  tasks: PairedTaskValues[],
+  options: { iterations?: number; seed?: number; confidence?: number } = {}
+): DifferenceEstimate | null {
+  const usable = tasks.filter((task) => task.reference.length > 0 && task.candidate.length > 0);
+  if (usable.length === 0) {
+    return null;
+  }
+
+  const ratio = (sample: PairedTaskValues[], inner: boolean, random: () => number): number | null => {
+    let reference = 0;
+    let candidate = 0;
+    for (const task of sample) {
+      reference += average(inner ? resample(task.reference, random) : task.reference);
+      candidate += average(inner ? resample(task.candidate, random) : task.candidate);
+    }
+    return reference === 0 ? null : candidate / reference - 1;
+  };
+
+  const random = createRandom(options.seed ?? 20261003);
+  const point = ratio(usable, false, random);
+  if (point === null) {
+    return null;
+  }
+
+  const iterations = options.iterations ?? 2000;
+  const confidence = options.confidence ?? 0.95;
+  const estimates: number[] = [];
+  for (let i = 0; i < iterations; i += 1) {
+    const estimate = ratio(resample(usable, random), true, random);
+    if (estimate !== null) {
+      estimates.push(estimate);
+    }
+  }
+  estimates.sort((a, b) => a - b);
+
+  const tail = (1 - confidence) / 2;
+  const last = estimates.length - 1;
+  return {
+    mean: point,
+    low: estimates[Math.floor(tail * last)] ?? point,
+    high: estimates[Math.ceil((1 - tail) * last)] ?? point
+  };
+}
+
 export function mean(values: number[]): number | null {
   return values.length === 0 ? null : values.reduce((total, value) => total + value, 0) / values.length;
 }

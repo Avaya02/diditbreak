@@ -5,9 +5,11 @@ import { parseExperimentSettings } from "../src/config.js";
 import { isContextPath, listSections, removeSection } from "../src/context/context-files.js";
 import { buildVariants, planAblation } from "../src/experiment/variants.js";
 import { planJobs } from "../src/experiment/run-experiment.js";
-import { pairedBootstrap, wilsonInterval } from "../src/stats/stats.js";
+import { runShell } from "../src/sandbox/shell.js";
+import { pairedBootstrap, pairedRelativeChange, wilsonInterval } from "../src/stats/stats.js";
+import { summarizeExperiment } from "../src/stats/summarize.js";
 import { parseTask, TaskFileError } from "../src/tasks/load-tasks.js";
-import type { AgentRunInput, AgentRunResult, AgentTask } from "../src/types.js";
+import type { AgentRunInput, AgentRunResult, AgentTask, ExperimentResult, TrialResult } from "../src/types.js";
 import { evaluateChecks, pathMatcher } from "../src/verify/checks.js";
 
 describe("isContextPath", () => {
@@ -213,6 +215,140 @@ describe("pairedBootstrap", () => {
 
   it("handles no usable tasks", () => {
     expect(pairedBootstrap([{ reference: [], candidate: [true] }])).toEqual({ mean: 0, low: 0, high: 0 });
+  });
+});
+
+describe("pairedRelativeChange", () => {
+  it("backs a clear cost increase with an interval above zero", () => {
+    const tasks = Array.from({ length: 4 }, () => ({ reference: [1, 1.1, 0.9], candidate: [2, 2.2, 1.8] }));
+    const estimate = pairedRelativeChange(tasks)!;
+    expect(estimate.mean).toBeCloseTo(1, 6);
+    expect(estimate.low).toBeGreaterThan(0.5);
+  });
+
+  it("calls overlapping costs noise", () => {
+    const tasks = [
+      { reference: [1, 3, 2], candidate: [3, 1, 2.6] },
+      { reference: [2, 1, 3], candidate: [1, 3, 2.4] }
+    ];
+    const estimate = pairedRelativeChange(tasks)!;
+    expect(estimate.low).toBeLessThan(0);
+    expect(estimate.high).toBeGreaterThan(0);
+  });
+
+  it("counts each task once, however many runs it has", () => {
+    // Pooling runs would give +20%: the extra runs of the unchanged task would
+    // outvote the task that doubled. Per task: (2 + 1) / (1 + 1) − 1 = +50%.
+    const estimate = pairedRelativeChange([
+      { reference: [1, 1, 1, 1], candidate: [2] },
+      { reference: [1], candidate: [1, 1, 1, 1] }
+    ])!;
+    expect(estimate.mean).toBeCloseTo(0.5, 6);
+  });
+
+  it("is reproducible, and returns null when there is nothing to compare", () => {
+    const tasks = [{ reference: [1, 2], candidate: [2, 3] }];
+    expect(pairedRelativeChange(tasks)).toEqual(pairedRelativeChange(tasks));
+    expect(pairedRelativeChange([{ reference: [], candidate: [1] }])).toBeNull();
+    expect(pairedRelativeChange([{ reference: [0, 0], candidate: [1] }])).toBeNull();
+  });
+});
+
+describe("runShell", () => {
+  it("stops a command when interrupted", async () => {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 100);
+    const started = Date.now();
+    const result = await runShell("sleep 30", process.cwd(), 10_000, controller.signal);
+    expect(result.exitCode).toBe(130);
+    expect(Date.now() - started).toBeLessThan(5000);
+  });
+
+  it("does not start a command once interrupted", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    expect((await runShell("echo hi", process.cwd(), 10_000, controller.signal)).exitCode).toBe(130);
+  });
+});
+
+describe("summarizeExperiment problems", () => {
+  function trial(variant: string, taskId: string, failure: TrialResult["failure"]): TrialResult {
+    return {
+      variant,
+      taskId,
+      trial: 1,
+      passed: failure === null,
+      failure,
+      verify: [],
+      checks: [],
+      changedFiles: [],
+      diffPath: "",
+      transcriptPath: "",
+      agent: {
+        completed: failure !== "infra-error",
+        ...(failure === "infra-error" ? { error: "model API error (HTTP 529): overloaded", infraError: true } : {}),
+        finalMessage: "",
+        turns: failure === "infra-error" ? 0 : 3,
+        durationMs: 0,
+        costUsd: failure === "infra-error" ? 0 : 0.05,
+        inputTokens: 0,
+        outputTokens: 0,
+        contextTokens: null,
+        toolCalls: [],
+        skillsUsed: [],
+        commands: [],
+        permissionDenials: 0,
+        environment: { skillsLoaded: [], mcpServers: [], agents: [] }
+      }
+    };
+  }
+
+  function experiment(results: TrialResult[], status: ExperimentResult["status"] = "complete"): ExperimentResult {
+    return {
+      schemaVersion: 1,
+      id: "x",
+      status,
+      startedAt: "",
+      durationMs: 0,
+      agent: { name: "mock", maxTurns: 1, maxBudgetUsd: 1, permissionMode: "acceptEdits", allowedTools: [], isolateMcp: true },
+      trials: 1,
+      variants: ["HEAD", "working"].map((name) => ({ name, context: { kind: "working" as const }, remove: [], removeSections: [] })),
+      tasks: [{ id: "a", file: "a.yaml" }, { id: "b", file: "b.yaml" }],
+      results
+    };
+  }
+
+  it("refuses to treat a mostly unrunnable experiment as evidence", () => {
+    const summary = summarizeExperiment(
+      experiment([
+        trial("HEAD", "a", null),
+        trial("HEAD", "b", "infra-error"),
+        trial("working", "a", "infra-error"),
+        trial("working", "b", "infra-error")
+      ])
+    );
+    expect(summary.problems).toEqual([
+      "3 of 4 runs could not run: model API error (HTTP 529): overloaded",
+      'setup "working" has no runs that measured the agent'
+    ]);
+  });
+
+  it("accepts an experiment where only a few runs could not run", () => {
+    const summary = summarizeExperiment(
+      experiment([trial("HEAD", "a", null), trial("HEAD", "b", null), trial("working", "a", null), trial("working", "b", "infra-error")])
+    );
+    expect(summary.problems).toEqual([]);
+    expect(summary.variants.find((v) => v.name === "working")).toMatchObject({ runs: 1, couldNotRun: 1, passRate: 1 });
+  });
+
+  it("does not expect every setup to have run when the experiment was interrupted", () => {
+    expect(summarizeExperiment(experiment([trial("HEAD", "a", null)], "interrupted")).problems).toEqual([]);
+  });
+
+  it("reads results saved before statuses existed as complete", () => {
+    const old = experiment([trial("HEAD", "a", null), trial("working", "a", null)]);
+    delete old.status;
+    expect(summarizeExperiment(old).problems).toEqual([]);
   });
 });
 

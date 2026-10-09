@@ -30,11 +30,12 @@ The demo project's committed `CLAUDE.md` is short and correct: *run tests with `
  HEAD       4/4  100%    $0.049    9.0    18.5k    22s
  working    3/4   75%    $0.067    11.0   18.9k    38s
 
- vs HEAD
-   none     ±0 pts    (95% CI ±0 … ±0 pts)         no clear difference
-            cost −49% · turns −67% · starting context −193 tokens
-   working  −25 pts   (95% CI −75 … ±0 pts)        no clear difference
-            cost +36% · turns +22% · starting context +450 tokens
+ vs HEAD  (95% intervals: one that spans zero could be noise)
+   With 2 tasks, intervals describe these tasks and can be too narrow; 5+ tasks make them more reliable.
+   none     ±0 pts    (±0 … ±0)      no clear difference
+            cost −49% (−49% … −48%) · turns −67% (−67% … −67%) · starting context −193 tokens
+   working  −25 pts   (−75 … ±0)     no clear difference
+            cost +36% (+14% … +60%) · turns +22% (+6% … +44%) · starting context +450 tokens
 
  Rules broken  (runs that broke the rule / runs)
    forbid_command npm install  none 0/4   HEAD 0/4   working 1/4
@@ -48,9 +49,9 @@ The demo project's committed `CLAUDE.md` is short and correct: *run tests with `
 
 What it shows:
 - **The edit confused the agent.** Following the wiki, it tried `npm install --save-dev jest` against the project's "no dependencies" rule, and wrote tests under a third naming convention neither file asked for.
-- **It made every task more expensive:** 36% more cost and 22% more turns.
+- **It made every task more expensive:** 36% more cost and 22% more turns, and both intervals stay above zero (+14% to +60% and +6% to +44%), so that is not noise.
 - **Even good context has a price.** The correct `CLAUDE.md` doubled the cost compared with no file, because the agent did what it said and wrote and ran tests. That trade-off is now a number instead of a guess.
-- **The verdict stays honest.** One failure in four runs is not proof, so it reports *no clear difference* with the interval, rather than *worse*. More trials narrow it.
+- **The verdict stays honest.** One failure in four runs is not proof, so it reports *no clear difference* with the interval, rather than *worse*. More trials narrow it, and with only two tasks the report says its intervals are rough.
 
 ## What it measures
 
@@ -70,7 +71,7 @@ What it shows:
 | `diditbreak ablate [file]` | Remove one `CLAUDE.md` section, then one skill, at a time to find what helps and what hurts |
 | `diditbreak report [results.json]` | Re-render a past run without re-running anything |
 
-Exit codes: `0` no regression · `1` the last setup is clearly worse · `2` setup or configuration error.
+Exit codes: `0` no regression · `1` the last setup is clearly worse · `2` the experiment could not run or could not answer (a setup or configuration error, or most runs could not start) · `130` interrupted.
 
 ## Writing tasks
 
@@ -82,7 +83,8 @@ prompt: |
   replaces every run of non-alphanumeric characters with one hyphen, and
   strips leading and trailing hyphens. Export it.
 
-# Must all exit 0. The agent never sees this file, so it cannot game the check.
+# Must all exit 0, and at least one must fail until the task is done. The agent
+# never sees this file, so it cannot write code aimed at the check.
 verify: >-
   node -e "import('./src/strings.js').then(({ slugify: s }) =>
   process.exit(s('  Hello, World!  ') === 'hello-world' ? 0 : 1))"
@@ -96,12 +98,16 @@ checks:
   # max_cost_usd: 0.50
 ```
 
+Before spending anything, diditbreak runs each task's `verify` and `checks` on an untouched sandbox. If an agent that changes nothing would pass (an existing test suite on its own usually does), it warns you: that task reports every setup as equally good.
+
 ## Why you can trust the numbers
 
 - **Same code, different context.** Each trial gets its own git worktree: the code comes from the task's base commit, and only the context files differ between setups. Both states are committed, so the agent's diff holds only its own work. Your working tree is never touched.
 - **Statistics that respect noise.** Agents are random, so every task runs several times. Pass rates get Wilson intervals, and comparisons use a paired bootstrap over tasks, then trials. *Better* or *worse* is only claimed when the difference survives resampling.
 - **Your machine stays out of the result.** Personal settings and MCP servers are shut out (`--setting-sources project`, `--strict-mcp-config`). Skills that load from outside the repo are disclosed in the report rather than hidden.
 - **Spend is bounded.** Every run has a hard budget enforced by the agent itself. Before a real experiment, diditbreak shows the plan and the worst case, then asks.
+- **A broken setup is never a pass.** Runs that could not run at all (Claude Code missing or logged out, a rejected API key, a failing setup command, a model API outage) are left out of the numbers and listed separately. If most runs could not run, there is no verdict and the exit code is `2`, so a CI gate cannot pass without testing anything. A rejected key stops each run at the first failed call, and the experiment stops after the first three, instead of waiting out Claude Code's three minutes of retries per run.
+- **Interruptions are safe.** Ctrl-C (or a cancelled CI job) stops every running agent and anything it started, removes the sandboxes, and keeps the runs that finished. Results are saved after every run, so even a crash leaves a report: `diditbreak report` shows it, marked incomplete.
 
 ## In CI
 

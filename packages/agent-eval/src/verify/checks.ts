@@ -19,11 +19,16 @@ export function pathMatcher(pattern: string): (path: string) => boolean {
 }
 
 /** Runs verification commands in order, stopping at the first failure. */
-export async function runVerify(commands: string[], cwd: string, timeoutMs: number): Promise<VerifyOutcome[]> {
+export async function runVerify(
+  commands: string[],
+  cwd: string,
+  timeoutMs: number,
+  signal?: AbortSignal
+): Promise<VerifyOutcome[]> {
   const outcomes: VerifyOutcome[] = [];
 
   for (const command of commands) {
-    const result = await runShell(command, cwd, timeoutMs);
+    const result = await runShell(command, cwd, timeoutMs, signal);
     outcomes.push({ command, exitCode: result.exitCode, output: result.output.trim() });
     if (result.exitCode !== 0) {
       break;

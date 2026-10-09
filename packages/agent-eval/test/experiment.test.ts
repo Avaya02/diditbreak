@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { access, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -9,11 +10,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "../src/config.js";
 import { MockAgentAdapter } from "../src/agents/mock.js";
 import { readContextFiles } from "../src/context/context-files.js";
+import { checkTasks } from "../src/experiment/check-tasks.js";
 import { runExperiment } from "../src/experiment/run-experiment.js";
 import { buildVariants, planAblation } from "../src/experiment/variants.js";
 import { summarizeExperiment } from "../src/stats/summarize.js";
 import { parseTask } from "../src/tasks/load-tasks.js";
-import type { AgentTask, ExperimentResult } from "../src/types.js";
+import type { AgentAdapter, AgentRunInput, AgentRunResult, AgentTask, ExperimentResult } from "../src/types.js";
 
 const exec = promisify(execFile);
 const git = (cwd: string, ...args: string[]) =>
@@ -79,7 +81,11 @@ afterAll(async () => {
   await rm(runs, { recursive: true, force: true });
 });
 
-async function experiment(variants: ReturnType<typeof buildVariants>, runId: string): Promise<ExperimentResult> {
+async function experiment(
+  variants: ReturnType<typeof buildVariants>,
+  runId: string,
+  overrides: Partial<Parameters<typeof runExperiment>[0]> = {}
+): Promise<ExperimentResult> {
   return runExperiment({
     repoRoot: repo,
     runDir: join(runs, runId),
@@ -90,8 +96,40 @@ async function experiment(variants: ReturnType<typeof buildVariants>, runId: str
     config: { ...DEFAULT_SETTINGS.agent, name: "mock" },
     trials: 3,
     concurrency: 3,
-    setup: []
+    setup: [],
+    ...overrides
   });
+}
+
+const exists = (path: string) =>
+  access(path).then(
+    () => true,
+    () => false
+  );
+
+async function worktreeCount(): Promise<number> {
+  const { stdout } = await git(repo, "worktree", "list");
+  return stdout.trim().split("\n").length;
+}
+
+function couldNotRun(error: string): AgentRunResult {
+  return {
+    completed: false,
+    error,
+    infraError: true,
+    finalMessage: "",
+    turns: 0,
+    durationMs: 0,
+    costUsd: 0,
+    inputTokens: 0,
+    outputTokens: 0,
+    contextTokens: null,
+    toolCalls: [],
+    skillsUsed: [],
+    commands: [],
+    permissionDenials: 0,
+    environment: { skillsLoaded: [], mcpServers: [], agents: [] }
+  };
 }
 
 describe("runExperiment end to end", () => {
@@ -131,6 +169,21 @@ describe("runExperiment end to end", () => {
     expect(head.changedFiles).toEqual([head.taskId === "add-greet" ? "src/greet.ts" : "src/farewell.ts"]);
     const patch = await readFile(join(runs, "compare", head.diffPath), "utf-8");
     expect(patch).not.toContain("CLAUDE.md");
+  });
+
+  it("puts an interval on cost, so a cost change is backed or labelled noise", () => {
+    const working = summarizeExperiment(result).comparisons.find((c) => c.variant === "working")!;
+    // The mock's cost grows with context, identically every trial.
+    expect(working.costChange).toBeGreaterThan(0);
+    expect(working.costChangeInterval!.low).toBeGreaterThan(0);
+    expect(working.turnsChangeInterval).not.toBeNull();
+  });
+
+  it("marks the saved results complete, with the size of the plan", async () => {
+    const saved = JSON.parse(await readFile(join(runs, "compare", "results.json"), "utf-8")) as ExperimentResult;
+    expect(saved.status).toBe("complete");
+    expect(saved.plannedRuns).toBe(18);
+    expect(summarizeExperiment(saved).problems).toEqual([]);
   });
 
   it("measures heavier starting context for heavier CLAUDE.md files", () => {
@@ -195,5 +248,158 @@ describe("ablation end to end", () => {
     expect(verdict("no-section-Legacy")).toBe("better");
     expect(verdict("no-section-Style")).toBe("no-clear-difference");
     expect(verdict("no-section-Tooling")).toBe("no-clear-difference");
+  });
+});
+
+describe("when runs cannot start", () => {
+  it("stops after the first few instead of reproducing the failure for the whole plan", async () => {
+    let calls = 0;
+    const brokenKey: AgentAdapter = {
+      name: "mock",
+      run: async () => {
+        calls += 1;
+        return couldNotRun("model API error (HTTP 401): authentication failed");
+      }
+    };
+
+    const result = await experiment(buildVariants(["HEAD", "working"], { baseline: true }), "stopped", {
+      agent: brokenKey,
+      concurrency: 1
+    });
+
+    expect(calls).toBe(3);
+    expect(result.status).toBe("stopped");
+    expect(result.stopReason).toMatch(/authentication failed/);
+    expect(result.results.every((r) => r.failure === "infra-error")).toBe(true);
+
+    const summary = summarizeExperiment(result);
+    expect(summary.problems[0]).toMatch(/stopped early because runs could not start: .*authentication failed/);
+    // Nothing measured, so no setup can look better or worse than another.
+    expect(summary.variants.every((v) => v.runs === 0)).toBe(true);
+    expect(await worktreeCount()).toBe(1);
+  });
+
+  it("leaves a failed sandbox setup out of the pass rate", async () => {
+    const result = await experiment(buildVariants(["HEAD"], { baseline: false }), "bad-setup", {
+      setup: ["exit 3"],
+      trials: 1
+    });
+
+    expect(result.results[0]!.failure).toBe("infra-error");
+    expect(result.results[0]!.agent.error).toMatch(/setup command failed \(exit 3\)/);
+    // Both planned runs failed to start, which is enough to stop.
+    expect(result.status).toBe("stopped");
+    const summary = summarizeExperiment(result);
+    expect(summary.variants[0]).toMatchObject({ runs: 0, couldNotRun: 2 });
+    expect(summary.problems).toEqual([expect.stringMatching(/could not start: sandbox: .*setup command failed/)]);
+  });
+
+  it("keeps going when only some runs fail to start, and leaves those out", async () => {
+    let calls = 0;
+    const flaky: AgentAdapter = {
+      name: "mock",
+      run: async (input: AgentRunInput) => {
+        calls += 1;
+        return calls === 2 ? couldNotRun("model API error (HTTP 529): overloaded") : new MockAgentAdapter().run(input);
+      }
+    };
+
+    const result = await experiment(buildVariants(["HEAD"], { baseline: false }), "one-flake", { agent: flaky, concurrency: 1 });
+
+    expect(result.status).toBe("complete");
+    expect(result.results).toHaveLength(6);
+    const head = summarizeExperiment(result).variants[0]!;
+    expect(head).toMatchObject({ runs: 5, passed: 5, passRate: 1, couldNotRun: 1 });
+    expect(head.couldNotRunReasons).toEqual({ "model API error (HTTP 529): overloaded": 1 });
+  });
+});
+
+describe("when the experiment is interrupted", () => {
+  it("stops running agents, cleans up, and keeps the runs that finished", async () => {
+    const controller = new AbortController();
+    let calls = 0;
+    let sandboxOfHungRun = "";
+    const hangsOnThirdRun: AgentAdapter = {
+      name: "mock",
+      run: (input: AgentRunInput) => {
+        calls += 1;
+        if (calls < 3) {
+          return new MockAgentAdapter().run(input);
+        }
+        sandboxOfHungRun = input.cwd;
+        setTimeout(() => controller.abort(), 50);
+        return new Promise<AgentRunResult>((resolve) => {
+          input.signal!.addEventListener("abort", () => resolve(couldNotRun("interrupted")), { once: true });
+        });
+      }
+    };
+
+    const progress: string[] = [];
+    const result = await experiment(buildVariants(["HEAD", "working"], { baseline: false }), "interrupted", {
+      agent: hangsOnThirdRun,
+      concurrency: 1,
+      signal: controller.signal,
+      onProgress: ({ done }) => progress.push(String(done))
+    });
+
+    expect(result.status).toBe("interrupted");
+    expect(result.plannedRuns).toBe(12);
+    // The half-finished third run is discarded, not counted as a failure.
+    expect(result.results).toHaveLength(2);
+    expect(progress).toEqual(["1", "2"]);
+
+    const saved = JSON.parse(await readFile(join(runs, "interrupted", "results.json"), "utf-8")) as ExperimentResult;
+    expect(saved.status).toBe("interrupted");
+    expect(saved.results).toHaveLength(2);
+    expect(summarizeExperiment(saved).problems).toEqual([]);
+
+    expect(await worktreeCount()).toBe(1);
+    expect(await exists(sandboxOfHungRun)).toBe(false);
+  });
+
+  it("saves results after every run, so even a crash leaves a readable file", async () => {
+    const seen: Array<{ status: string | undefined; results: number }> = [];
+    await experiment(buildVariants(["HEAD"], { baseline: false }), "incremental", {
+      concurrency: 1,
+      trials: 2,
+      onProgress: () => {
+        const saved = JSON.parse(readFileSync(join(runs, "incremental", "results.json"), "utf-8")) as ExperimentResult;
+        seen.push({ status: saved.status, results: saved.results.length });
+      }
+    });
+
+    // Each progress event sees the file as it stood before that run was added.
+    expect(seen).toEqual([
+      { status: "running", results: 0 },
+      { status: "running", results: 1 },
+      { status: "running", results: 2 },
+      { status: "running", results: 3 }
+    ]);
+  });
+});
+
+describe("checkTasks", () => {
+  it("flags a task an agent that does nothing would pass", async () => {
+    const vacuous = parseTask({ prompt: "Improve the project.", verify: ["test -f CLAUDE.md"] }, "vacuous.yaml");
+    const result = await checkTasks({ repoRoot: repo, runId: "check", tasks: [...tasks, vacuous], setup: [], concurrency: 2 });
+
+    expect(result.passedByDoingNothing.map((task) => task.id)).toEqual(["vacuous"]);
+    expect(await worktreeCount()).toBe(1);
+  });
+
+  it("counts a must_change check as proof the agent has to act", async () => {
+    const guarded = parseTask(
+      { prompt: "Edit the style guide.", verify: ["true"], checks: { must_change: ["CLAUDE.md"] } },
+      "guarded.yaml"
+    );
+    const result = await checkTasks({ repoRoot: repo, runId: "check-guarded", tasks: [guarded], setup: [], concurrency: 1 });
+    expect(result.passedByDoingNothing).toEqual([]);
+  });
+
+  it("fails before anything is spent when the project's setup is broken", async () => {
+    await expect(
+      checkTasks({ repoRoot: repo, runId: "check-setup", tasks, setup: ["exit 7"], concurrency: 1 })
+    ).rejects.toThrow(/task add-(greet|farewell): setup command failed \(exit 7\)/);
+    expect(await worktreeCount()).toBe(1);
   });
 });
