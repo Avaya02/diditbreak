@@ -1,6 +1,6 @@
 {
   "name": "diditbreak",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Did your CLAUDE.md change make your coding agent better or worse? Runs real tasks under each context setup and measures success, cost and confusion.",
   "keywords": [
     "claude-code",
