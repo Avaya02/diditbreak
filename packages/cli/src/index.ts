@@ -8,6 +8,9 @@ import { runInitCommand } from "./commands/init-command.js";
 import { runTestCommand } from "./commands/test-command.js";
 import { CLI_VERSION } from "./version.js";
 
+const COMPARE_EXIT_CODES =
+  "Exit codes: 0 no regression · 1 the last setup is clearly worse · 2 the experiment could not run or answer (setup, configuration, or most runs could not start) · 130 interrupted";
+
 const experimentOptions = {
   trials: { type: "number", describe: "Runs per task per setup (default 3)" },
   tasks: { type: "string", describe: "Task directory (default .diditbreak/tasks)" },
@@ -90,7 +93,7 @@ export async function runCli(argv: string[]): Promise<void> {
           })
           .option("reference", { type: "string", describe: "Setup to compare against (default: first non-baseline)" })
           .options(experimentOptions)
-          .epilogue("Exit codes: 0 no regression · 1 the last setup is clearly worse · 2 setup or configuration error"),
+          .epilogue(COMPARE_EXIT_CODES),
       async (args) => {
         process.exitCode = await runCompareCommand({
           setups: (args.setups as string[] | undefined) ?? [],
@@ -108,7 +111,8 @@ export async function runCli(argv: string[]): Promise<void> {
           .positional("file", { type: "string", default: "CLAUDE.md", describe: "Context file to split into sections" })
           .option("from", { type: "string", default: "working", describe: "Setup to ablate: `working` or a git ref" })
           .option("skills", { type: "boolean", default: true, describe: "Also remove each skill (--no-skills to skip)" })
-          .options(experimentOptions),
+          .options(experimentOptions)
+          .epilogue("Exit codes: 0 done · 2 the experiment could not run or answer · 130 interrupted"),
       async (args) => {
         process.exitCode = await runAblateCommand({
           file: args.file,

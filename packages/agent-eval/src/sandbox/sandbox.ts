@@ -34,6 +34,7 @@ export interface CreateSandboxInput {
   /** Commands run once before the agent starts, e.g. installing dependencies. */
   setup: string[];
   setupTimeoutMs: number;
+  signal?: AbortSignal | undefined;
 }
 
 // `git worktree add/remove` take repository-wide locks; parallel calls can fail
@@ -138,7 +139,10 @@ export async function createSandbox(input: CreateSandboxInput): Promise<Sandbox>
     // 4. Project setup, then commit again so setup output never shows up as
     //    the agent's work.
     for (const command of input.setup) {
-      const result = await runShell(command, dir, input.setupTimeoutMs);
+      const result = await runShell(command, dir, input.setupTimeoutMs, input.signal);
+      if (input.signal?.aborted) {
+        throw new SandboxError("interrupted during setup");
+      }
       if (result.exitCode !== 0) {
         throw new SandboxError(`setup command failed (exit ${result.exitCode}): ${command}\n${result.output}`);
       }

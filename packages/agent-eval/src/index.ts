@@ -11,12 +11,20 @@ export {
 } from "./context/context-files.js";
 export { GitError, repoRoot } from "./context/git.js";
 export { createSandbox, collectChanges, SandboxError } from "./sandbox/sandbox.js";
-export { runShell } from "./sandbox/shell.js";
+export { runShell, INTERRUPTED_EXIT_CODE } from "./sandbox/shell.js";
 export { ClaudeCodeAdapter, buildClaudeArgs, childEnvironment } from "./agents/claude-code.js";
-export { parseClaudeStream } from "./agents/parse-claude-stream.js";
+export { AgentUnavailableError } from "./agents/errors.js";
+export { fatalApiError, parseClaudeStream } from "./agents/parse-claude-stream.js";
 export { MockAgentAdapter } from "./agents/mock.js";
 export { evaluateChecks, pathMatcher, runVerify } from "./verify/checks.js";
-export { runExperiment, planJobs, type ExperimentProgress, type RunExperimentInput } from "./experiment/run-experiment.js";
+export {
+  runExperiment,
+  planJobs,
+  STOP_AFTER_INFRA_ERRORS,
+  type ExperimentProgress,
+  type RunExperimentInput
+} from "./experiment/run-experiment.js";
+export { checkTasks, type CheckTasksInput, type TaskCheckResult } from "./experiment/check-tasks.js";
 export {
   buildVariants,
   planAblation,
@@ -25,7 +33,16 @@ export {
   WORKING,
   type AblationPlan
 } from "./experiment/variants.js";
-export { pairedBootstrap, wilsonInterval, createRandom, mean, type Interval } from "./stats/stats.js";
+export {
+  pairedBootstrap,
+  pairedRelativeChange,
+  wilsonInterval,
+  createRandom,
+  mean,
+  type DifferenceEstimate,
+  type Interval,
+  type PairedTaskValues
+} from "./stats/stats.js";
 export {
   summarizeExperiment,
   type Comparison,

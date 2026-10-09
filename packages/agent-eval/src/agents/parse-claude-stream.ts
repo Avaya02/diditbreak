@@ -26,14 +26,59 @@ interface StreamEvent {
   mcp_servers?: Array<{ name?: string }>;
   // assistant
   message?: { id?: string; content?: ContentBlock[]; usage?: Usage };
+  // api_retry: Claude Code retrying a failed model API call
+  error?: string;
+  error_status?: number;
   // result
   is_error?: boolean;
+  /** Set when the run ended because the model API failed. */
+  api_error_status?: number;
   num_turns?: number;
   duration_ms?: number;
   total_cost_usd?: number;
   usage?: Usage;
   result?: string;
   permission_denials?: unknown[];
+}
+
+/**
+ * API errors that retrying cannot fix within a run. Claude Code retries them
+ * anyway (10 attempts with backoff, about three minutes for a bad key), so the
+ * adapter watches for them and stops the run at the first one.
+ */
+const FATAL_API_ERRORS: Record<string, string> = {
+  authentication_failed: "authentication failed: check ANTHROPIC_API_KEY, or run `claude` once to log in",
+  billing_error: "the account cannot be billed: check its credits or plan"
+};
+
+function describeApiError(error: string | undefined, status: number | undefined): string {
+  const known = error !== undefined ? FATAL_API_ERRORS[error] : undefined;
+  const code = status !== undefined ? ` (HTTP ${status})` : "";
+  return `model API error${code}: ${known ?? error ?? "request failed"}`;
+}
+
+/**
+ * Returns why a stream line means the run cannot succeed, or null. Takes a raw
+ * line so the adapter can check output as it arrives.
+ */
+export function fatalApiError(line: string): string | null {
+  if (!line.includes('"api_retry"')) {
+    return null;
+  }
+  let event: StreamEvent;
+  try {
+    event = JSON.parse(line) as StreamEvent;
+  } catch {
+    return null;
+  }
+  if (event.type !== "system" || event.subtype !== "api_retry") {
+    return null;
+  }
+  const fatal =
+    (event.error !== undefined && event.error in FATAL_API_ERRORS) ||
+    event.error_status === 401 ||
+    event.error_status === 403;
+  return fatal ? describeApiError(event.error, event.error_status) : null;
 }
 
 function promptTokens(usage: Usage | undefined): number {
@@ -123,9 +168,14 @@ export function parseClaudeStream(jsonl: string): AgentRunResult {
   const result = events.find((event) => event.type === "result");
 
   if (!result) {
+    // Stopped at a fatal retry (by the adapter), or crashed: either way the
+    // agent never got a fair attempt at the task.
+    const retry = [...events].reverse().find((event) => event.type === "system" && event.subtype === "api_retry");
+    const fatal = retry ? fatalApiError(JSON.stringify(retry)) : null;
     return {
       completed: false,
-      error: "the agent exited without a result (crashed, or was killed)",
+      error: fatal ?? "the agent exited without a result (crashed, or was killed)",
+      infraError: true,
       finalMessage: lastText,
       turns: seenMessages.size,
       durationMs: 0,
@@ -142,11 +192,25 @@ export function parseClaudeStream(jsonl: string): AgentRunResult {
   }
 
   const succeeded = result.subtype === "success" && result.is_error !== true;
+  const apiFailed = !succeeded && result.api_error_status !== undefined;
+  const resultText = typeof result.result === "string" ? result.result.trim().split("\n")[0]! : "";
+
+  let error: string | undefined;
+  if (apiFailed) {
+    const retry = [...events].reverse().find((event) => event.type === "system" && event.subtype === "api_retry");
+    error = retry?.error !== undefined && retry.error in FATAL_API_ERRORS
+      ? describeApiError(retry.error, result.api_error_status)
+      : `model API error (HTTP ${result.api_error_status})${resultText ? `: ${resultText}` : ""}`;
+  } else if (!succeeded) {
+    // Subtypes such as error_max_turns name the limit that stopped the agent;
+    // an error reported under "success" carries its reason in the result text.
+    error = result.subtype !== undefined && result.subtype !== "success" ? result.subtype : resultText || "error";
+  }
 
   return {
     completed: succeeded,
-    // Subtypes such as error_max_turns name the limit that stopped the agent.
-    ...(succeeded ? {} : { error: result.subtype ?? "error" }),
+    ...(error !== undefined ? { error } : {}),
+    ...(apiFailed ? { infraError: true } : {}),
     finalMessage: typeof result.result === "string" ? result.result : lastText,
     turns: result.num_turns ?? seenMessages.size,
     durationMs: result.duration_ms ?? 0,

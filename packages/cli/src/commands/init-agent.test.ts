@@ -44,7 +44,13 @@ describe("diditbreak init (agent experiments)", () => {
 
     const [task] = await loadTasks(cwd, ".diditbreak/tasks");
     expect(task?.id).toBe("example");
-    expect(task?.verify).toEqual(["npm test"]);
+    // The suite alone would pass before the agent does anything; the example
+    // must also show a check that only passes once the task is done.
+    expect(task?.verify).toEqual([
+      "npm test",
+      `node cli.js --version | grep -qF "$(node -p 'require("./package.json").version')"`
+    ]);
+    expect(task?.checks.mustChange).toEqual(["cli.js"]);
 
     expect(await readFile(join(cwd, ".diditbreak/runs/.gitignore"), "utf-8")).toBe("*\n");
   });

@@ -1,0 +1,2 @@
+{"type":"system","subtype":"init","cwd":"/tmp/sandbox","model":"claude-opus-4-8[1m]","claude_code_version":"2.1.202","apiKeySource":"ANTHROPIC_API_KEY","skills":[],"agents":[],"mcp_servers":[]}
+{"type":"system","subtype":"api_retry","attempt":1,"max_retries":10,"retry_delay_ms":530.9502261480736,"error_status":401,"error":"authentication_failed"}

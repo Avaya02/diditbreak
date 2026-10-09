@@ -19,9 +19,9 @@ npx diditbreak compare                # real Claude Code runs; asks before spend
  HEAD       4/4  100%    $0.049    9.0    18.5k    22s
  working    3/4   75%    $0.067    11.0   18.9k    38s
 
- vs HEAD
-   working  −25 pts   (95% CI −75 … ±0 pts)        no clear difference
-            cost +36% · turns +22% · starting context +450 tokens
+ vs HEAD  (95% intervals: one that spans zero could be noise)
+   working  −25 pts   (−75 … ±0)     no clear difference
+            cost +36% (+14% … +60%) · turns +22% (+6% … +44%) · starting context +450 tokens
 
  Rules broken
    forbid_command npm install  none 0/4   HEAD 0/4   working 1/4
@@ -41,9 +41,9 @@ That block is real Claude Code output. Pasting 41 lines of team-wiki guidelines 
 | `diditbreak report [results.json]` | Re-render a past run |
 | `diditbreak init --prompts`, `test` | The prompt regression suite |
 
-Exit codes: `0` no regression · `1` the last setup is clearly worse · `2` setup error.
+Exit codes: `0` no regression · `1` the last setup is clearly worse · `2` the experiment could not run or answer · `130` interrupted.
 
-Verdicts use a paired bootstrap, so *better* or *worse* is only claimed when the difference survives resampling. Each run has a hard budget cap enforced by the agent, and you see the worst case before anything runs.
+Verdicts and cost changes use a paired bootstrap, so *better*, *worse* or *more expensive* is only claimed when the difference survives resampling. Runs that could not start (no login, a rejected key, a failing setup) are left out and reported, never counted as a pass. Each run has a hard budget cap enforced by the agent, and you see the worst case before anything runs.
 
 One file, zero dependencies, Node 20+. Supports Claude Code today, plus a free mock agent for CI.
 

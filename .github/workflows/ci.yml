@@ -191,6 +191,33 @@ jobs:
           set +e; npx --prefix /tmp/new-user diditbreak compare --agent mock --yes; code=$?; set -e
           test "$code" -eq 1
           npx --prefix /tmp/new-user diditbreak report --json | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const v=JSON.parse(d).summary.comparisons.find(c=>c.variant==="working");if(v.verdict!=="worse")process.exit(1)})'
+
+          # No agent installed: fail before spending anything, never pass.
+          set +e; DIDITBREAK_CLAUDE_BIN=/nonexistent npx --prefix /tmp/new-user diditbreak compare --yes; code=$?; set -e
+          test "$code" -eq 2
+
+          # Ctrl-C must stop running agents, clean up, and keep a readable
+          # result. node directly, so the signal reaches diditbreak, not npx.
+          cat > /tmp/slow-claude <<'SH'
+          #!/bin/sh
+          case "$1" in
+            --version) echo "2.1.202 (Claude Code)"; exit 0 ;;
+            auth) echo '{"loggedIn":true}'; exit 0 ;;
+          esac
+          touch /tmp/agent-started
+          sleep 60
+          SH
+          chmod +x /tmp/slow-claude
+          DIDITBREAK_CLAUDE_BIN=/tmp/slow-claude node /tmp/new-user/node_modules/diditbreak/dist/cli.js compare --yes --trials 1 > /dev/null 2>&1 &
+          pid=$!
+          for i in $(seq 1 150); do [ -f /tmp/agent-started ] && break; sleep 0.2; done
+          test -f /tmp/agent-started
+          kill -INT "$pid"
+          set +e; wait "$pid"; code=$?; set -e
+          test "$code" -eq 130
+          test "$(git worktree list | wc -l)" -eq 1
+          ! pgrep -f slow-claude
+          npx --prefix /tmp/new-user diditbreak report --json | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{if(JSON.parse(d).status!=="interrupted")process.exit(1)})'
           cd ..
 
           # Setup errors must exit 2, distinct from a regression (1).

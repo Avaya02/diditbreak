@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { parseClaudeStream } from "../src/agents/parse-claude-stream.js";
+import { fatalApiError, parseClaudeStream } from "../src/agents/parse-claude-stream.js";
 
 // A real `claude -p --output-format stream-json` transcript (paths and
 // connector names scrubbed): a skill-triggering task on Claude Code 2.1.202.
@@ -105,5 +105,72 @@ describe("parseClaudeStream edge cases", () => {
     expect(result.completed).toBe(false);
     expect(result.toolCalls).toEqual([]);
     expect(result.contextTokens).toBeNull();
+  });
+});
+
+// Real transcripts from Claude Code 2.1.202 run with an invalid API key: the
+// full run (ten retries over three minutes, then a result) and what the adapter
+// keeps when it stops the run at the first retry.
+const authFailure = readFileSync(new URL("./fixtures/claude-auth-failure.jsonl", import.meta.url), "utf-8");
+const authRetry = readFileSync(new URL("./fixtures/claude-auth-retry.jsonl", import.meta.url), "utf-8");
+
+describe("parseClaudeStream when the agent could not run", () => {
+  it("marks a rejected API key as an infrastructure error, not an agent failure", () => {
+    const result = parseClaudeStream(authFailure);
+    expect(result.completed).toBe(false);
+    expect(result.infraError).toBe(true);
+    expect(result.error).toMatch(/HTTP 401.*authentication failed/);
+    expect(result.costUsd).toBe(0);
+  });
+
+  it("explains a run stopped at its first failed authentication", () => {
+    const result = parseClaudeStream(authRetry);
+    expect(result.infraError).toBe(true);
+    expect(result.error).toMatch(/authentication failed: check ANTHROPIC_API_KEY/);
+  });
+
+  it("treats any other API failure the same way", () => {
+    const result = parseClaudeStream(
+      event({ type: "result", subtype: "success", is_error: true, api_error_status: 529, result: "API Error: 529 Overloaded" })
+    );
+    expect(result.infraError).toBe(true);
+    expect(result.error).toBe("model API error (HTTP 529): API Error: 529 Overloaded");
+  });
+
+  it("treats a crash without a result as an infrastructure error", () => {
+    expect(parseClaudeStream(event({ type: "system", subtype: "init" })).infraError).toBe(true);
+  });
+
+  it("reports an error result by its text rather than the word 'success'", () => {
+    const result = parseClaudeStream(event({ type: "result", subtype: "success", is_error: true, result: "Prompt is too long" }));
+    expect(result.error).toBe("Prompt is too long");
+    expect(result.infraError).toBeUndefined();
+  });
+
+  it("keeps turn and budget limits as the agent's own failures", () => {
+    const result = parseClaudeStream(event({ type: "result", subtype: "error_max_turns", is_error: true }));
+    expect(result.error).toBe("error_max_turns");
+    expect(result.infraError).toBeUndefined();
+  });
+});
+
+describe("fatalApiError", () => {
+  it("flags errors that retrying cannot fix", () => {
+    expect(fatalApiError(authRetry.split("\n")[1]!)).toMatch(/authentication failed/);
+    expect(fatalApiError(event({ type: "system", subtype: "api_retry", error: "billing_error", error_status: 400 }))).toMatch(
+      /cannot be billed/
+    );
+    expect(fatalApiError(event({ type: "system", subtype: "api_retry", error_status: 403 }))).toMatch(/HTTP 403/);
+  });
+
+  it("lets Claude Code retry errors that can clear up", () => {
+    expect(fatalApiError(event({ type: "system", subtype: "api_retry", error: "rate_limit", error_status: 429 }))).toBeNull();
+    expect(fatalApiError(event({ type: "system", subtype: "api_retry", error: "server_error", error_status: 529 }))).toBeNull();
+  });
+
+  it("ignores everything else", () => {
+    expect(fatalApiError(event({ type: "assistant", message: { content: [{ type: "text", text: "api_retry" }] } }))).toBeNull();
+    expect(fatalApiError('{"type":"system","subtype":"api_retry"')).toBeNull();
+    expect(fatalApiError("")).toBeNull();
   });
 });

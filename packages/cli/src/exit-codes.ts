@@ -7,5 +7,7 @@
 export const EXIT = {
   ok: 0,
   regression: 1,
-  error: 2
+  error: 2,
+  /** Stopped by Ctrl-C or SIGTERM, as shells report a process ended by SIGINT. */
+  interrupted: 130
 } as const;
