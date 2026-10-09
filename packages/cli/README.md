@@ -45,8 +45,8 @@ Exit codes: `0` no regression · `1` the last setup is clearly worse · `2` the 
 
 Verdicts and cost changes use a paired bootstrap, so *better*, *worse* or *more expensive* is only claimed when the difference survives resampling. Runs that could not start (no login, a rejected key, a failing setup) are left out and reported, never counted as a pass. Each run has a hard budget cap enforced by the agent, and you see the worst case before anything runs.
 
-One file, zero dependencies, Node 20+. Supports Claude Code today, plus a free mock agent for CI.
+One file, zero dependencies. Needs Node 20+ and git, on macOS or Linux (Windows via WSL). Supports Claude Code today, plus a free mock agent for CI.
 
-Docs and source: [github.com/Avaya02/PromptGuard](https://github.com/Avaya02/PromptGuard)
+Docs and source: [github.com/Avaya02/diditbreak](https://github.com/Avaya02/diditbreak)
 
 MIT
