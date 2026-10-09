@@ -273,6 +273,13 @@ async function execute(prepared: Prepared, variants: Variant[], options: Experim
   });
 
   try {
+    // Without a terminal there is no one to say yes: refuse before the checks,
+    // not after them.
+    if (prepared.settings.agent.name !== "mock" && !options.yes && !process.stdin.isTTY) {
+      const runs = variants.length * prepared.tasks.length * prepared.settings.trials;
+      throw new CliError(`${runs} agent runs would start without confirmation.`, "Pass --yes to run non-interactively (CI).");
+    }
+
     const warnings = await preflight(prepared, id, options, controller.signal);
     // An interrupted check can still return, its commands merely failing.
     if (controller.signal.aborted) {
